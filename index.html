@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Kanban Matrizes - Gravasul</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js"></script>
+  <style>
+    ::-webkit-scrollbar { width: 8px; height: 8px; }
+    ::-webkit-scrollbar-track { background: rgba(0,0,0,0.2); }
+    ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.25); border-radius: 4px; }
+  </style>
+</head>
+<body class="bg-gradient-to-br from-[#005c97] to-[#00395d] text-gray-200 h-screen flex flex-col overflow-hidden font-sans select-none">
+
+  <script>
+    const SUPABASE_URL = "https://aqjvvsisknicgeouvojm.supabase.co";
+    const SUPABASE_KEY = "sb_publishable_TLbL9Hk1HoFKwlwSUNDbyQ_fIsnPQwl";
+  </script>
+
+  <!-- TOPBAR -->
+  <header class="bg-[#1d2125]/90 backdrop-blur px-4 py-2.5 flex items-center justify-between border-b border-white/10 shrink-0">
+    <div class="flex items-center gap-4">
+      <h1 class="font-bold text-white text-lg tracking-wide">Gravasul | Prazos</h1>
+      <input id="searchInput" oninput="renderBoard()" type="text" placeholder="Filtrar cartões ou responsável..." 
+        class="bg-[#22272b] border border-gray-700 rounded px-3 py-1 text-sm text-white focus:outline-none focus:border-blue-500 w-64" />
+    </div>
+    <div class="flex items-center gap-3">
+      <span class="text-xs text-gray-400">Usuário ativo:</span>
+      <select id="currentUser" class="bg-[#22272b] border border-gray-700 rounded px-2.5 py-1 text-sm text-white font-semibold">
+        <option value="BrunoModel">BrunoModel</option>
+        <option value="Jully CNC">Jully CNC</option>
+        <option value="Jacaré">Jacaré</option>
+        <option value="Djow">Djow</option>
+        <option value="Douglas">Douglas</option>
+        <option value="Rogerio">Rogerio</option>
+      </select>
+      <button onclick="addNewColumn()" class="bg-white/10 hover:bg-white/20 text-white text-sm px-3 py-1.5 rounded font-medium transition">
+        + Adicionar outra lista
+      </button>
+    </div>
+  </header>
+
+  <!-- BOARD (COLUNAS) -->
+  <main id="boardContainer" class="flex-1 flex gap-3 p-3 overflow-x-auto items-start"></main>
+
+  <!-- MODAL DO CARTÃO -->
+  <div id="cardModal" class="fixed inset-0 bg-black/75 hidden items-start justify-center overflow-y-auto py-10 z-50">
+    <div class="bg-[#282e33] w-full max-w-5xl rounded-xl shadow-2xl border border-gray-700 overflow-hidden text-gray-200 my-auto">
+      
+      <!-- CAPA DO CARTÃO NO MODAL -->
+      <div id="modalCoverContainer" class="bg-[#1d2125] relative flex justify-center items-center max-h-56 overflow-hidden border-b border-gray-700 hidden">
+        <img id="modalCoverImg" src="" class="max-h-52 object-contain py-2" />
+      </div>
+
+      <!-- CABEÇALHO DO MODAL -->
+      <div class="p-5 flex justify-between items-start border-b border-gray-700/60">
+        <div class="flex-1 pr-4">
+          <input id="modalTitle" onchange="saveCardField('title', this.value)" 
+            class="bg-transparent text-xl font-bold text-white w-full focus:bg-[#1d2125] px-2 py-1 rounded outline-none" />
+          <p class="text-xs text-gray-400 px-2 mt-1">na lista <span id="modalColumnName" class="underline font-semibold"></span></p>
+        </div>
+        <div class="flex items-center gap-2">
+          <label class="bg-[#323940] hover:bg-[#3c444d] text-xs px-3 py-1.5 rounded cursor-pointer font-medium">
+            🖼️ Alterar Capa 3D
+            <input type="file" accept="image/*" class="hidden" onchange="uploadCover(event)" />
+          </label>
+          <button onclick="deleteCurrentCard()" class="bg-red-600/20 hover:bg-red-600/40 text-red-300 text-xs px-3 py-1.5 rounded">Excluir</button>
+          <button onclick="closeModal()" class="text-gray-400 hover:text-white text-xl px-2 font-bold">✕</button>
+        </div>
+      </div>
+
+      <!-- CORPO DO MODAL (2 COLUNAS) -->
+      <div class="grid grid-cols-1 md:grid-cols-12">
+        
+        <!-- COLUNA ESQUERDA: DADOS, AMAZING FIELDS E CHECKLISTS -->
+        <div class="md:col-span-7 p-5 space-y-5 border-r border-gray-700/60">
+          
+          <!-- DATA DE ENTREGA -->
+          <div class="flex items-center gap-4">
+            <div>
+              <label class="block text-xs text-gray-400 mb-1 font-semibold">Data Entrega</label>
+              <div class="flex items-center gap-2 bg-[#22272b] px-3 py-1.5 rounded border border-gray-700">
+                <input type="checkbox" id="modalCompleted" onchange="saveCardField('is_completed', this.checked)" class="w-4 h-4 accent-green-500" />
+                <input type="datetime-local" id="modalDueDate" onchange="saveCardField('due_date', this.value)" class="bg-transparent text-xs text-white outline-none" />
+              </div>
+            </div>
+          </div>
+
+          <!-- DESCRIÇÃO + DADOS SINCRONIZADOS -->
+          <div>
+            <label class="block text-sm font-semibold text-white mb-1">☰ Descrição</label>
+            <textarea id="modalDescription" onchange="saveCardField('description', this.value)" rows="3" placeholder="Ex: BASE P435, PNEU E.V, CNC 2..."
+              class="w-full bg-[#22272b] border border-gray-700 rounded p-2.5 text-sm text-white focus:border-blue-500 outline-none"></textarea>
+            
+            <div class="mt-2 bg-[#1d2125] border border-gray-700 rounded p-3 text-xs font-mono text-gray-300">
+              <div class="font-bold text-gray-400 mb-1">⚙️ Dados Sincronizados:</div>
+              <div id="syncDataPreview"></div>
+            </div>
+          </div>
+
+          <!-- CAMPOS PERSONALIZADOS (AMAZING FIELDS NATIVO) -->
+          <div>
+            <h3 class="text-sm font-semibold text-white mb-2">📊 Campos da Matriz (Amazing Fields)</h3>
+            <div class="grid grid-cols-3 gap-2.5 bg-[#22272b] p-3 rounded-lg border border-gray-700">
+              <div>
+                <label class="text-[11px] text-gray-400 block mb-1"># RESPONSÁVEL</label>
+                <input id="field_responsavel" onchange="saveCardField('responsavel', this.value.toUpperCase())" placeholder="Ex: JACARÉ, BRUNO"
+                  class="w-full bg-purple-700 text-white font-bold text-xs px-2 py-1.5 rounded outline-none placeholder-purple-300" />
+              </div>
+              <div>
+                <label class="text-[11px] text-gray-400 block mb-1"># DESTINO</label>
+                <select id="field_destino" onchange="saveCardField('destino', this.value)" class="w-full bg-indigo-700 text-white font-bold text-xs px-2 py-1.5 rounded outline-none">
+                  <option value="">--</option>
+                  <option value="TERCEIRO / PARCEIRO">TERCEIRO / PARCEIRO</option>
+                  <option value="GRAVASUL">GRAVASUL</option>
+                  <option value="INTERNO">INTERNO</option>
+                </select>
+              </div>
+              <div>
+                <label class="text-[11px] text-gray-400 block mb-1"># PROJETO</label>
+                <select id="field_projeto" onchange="saveCardField('projeto', this.value)" class="w-full bg-green-700 text-white font-bold text-xs px-2 py-1.5 rounded outline-none">
+                  <option value="">--</option><option value="S1">S1</option><option value="S2">S2</option><option value="S3">S3</option><option value="S4">S4</option><option value="S5">S5</option><option value="S6">S6</option>
+                </select>
+              </div>
+              <div>
+                <label class="text-[11px] text-gray-400 block mb-1">ACABAMENTO</label>
+                <select id="field_acabamento" onchange="saveCardField('acabamento', this.value)" class="w-full bg-green-700 text-white font-bold text-xs px-2 py-1.5 rounded outline-none">
+                  <option value="">--</option><option value="S1">S1</option><option value="S2">S2</option><option value="S3">S3</option><option value="S4">S4</option><option value="S5">S5</option><option value="S6">S6</option>
+                </select>
+              </div>
+              <div>
+                <label class="text-[11px] text-gray-400 block mb-1">COM MATERIAIS</label>
+                <select id="field_com_materiais" onchange="saveCardField('com_materiais', this.value)" class="w-full bg-green-700 text-white font-bold text-xs px-2 py-1.5 rounded outline-none">
+                  <option value="">--</option><option value="S1">S1</option><option value="S2">S2</option><option value="S3">S3</option><option value="S4">S4</option><option value="S5">S5</option><option value="S6">S6</option>
+                </select>
+              </div>
+              <div>
+                <label class="text-[11px] text-gray-400 block mb-1">Pos. Mol.</label>
+                <input id="field_pos_mol" onchange="saveCardField('pos_mol', this.value)" placeholder="Pos. Mol."
+                  class="w-full bg-[#1d2125] border border-gray-600 text-white text-xs px-2 py-1.5 rounded outline-none" />
+              </div>
+              <div>
+                <label class="text-[11px] text-gray-400 block mb-1">EQUIPE</label>
+                <select id="field_equipe" onchange="saveCardField('equipe', this.value)" class="w-full bg-sky-700 text-white font-bold text-xs px-2 py-1.5 rounded outline-none">
+                  <option value="">--</option><option value="CAD">CAD</option><option value="CAM">CAM</option><option value="CNC">CNC</option><option value="FACAS">FACAS</option><option value="POSTIÇOS">POSTIÇOS</option>
+                </select>
+              </div>
+              <div>
+                <label class="text-[11px] text-gray-400 block mb-1">Cadastro/Cartão</label>
+                <select id="field_cadastro_cartao" onchange="saveCardField('cadastro_cartao', this.value)" class="w-full bg-purple-800 text-white font-bold text-xs px-2 py-1.5 rounded outline-none">
+                  <option value="">--</option><option value="S1">S1</option><option value="S2">S2</option><option value="S3">S3</option><option value="S4">S4</option>
+                </select>
+              </div>
+              <div class="flex items-center gap-2 pt-4">
+                <input type="checkbox" id="field_especificacao" onchange="saveCardField('especificacao', this.checked)" class="w-4 h-4 accent-green-500" />
+                <label for="field_especificacao" class="text-xs font-semibold text-white">Especificação</label>
+              </div>
+            </div>
+          </div>
+
+          <!-- CHECKLISTS -->
+          <div>
+            <div class="flex items-center justify-between mb-2">
+              <h3 class="text-sm font-semibold text-white">☑️ Checklists</h3>
+              <div class="flex gap-1.5">
+                <button onclick="createTemplateChecklist('CAD')" class="bg-[#323940] hover:bg-[#3c444d] text-[11px] px-2.5 py-1 rounded">+ CAD</button>
+                <button onclick="createTemplateChecklist('CAM')" class="bg-[#323940] hover:bg-[#3c444d] text-[11px] px-2.5 py-1 rounded">+ CAM</button>
+                <button onclick="createTemplateChecklist('CNC')" class="bg-purple-600 hover:bg-purple-500 text-white text-[11px] px-2.5 py-1 rounded font-semibold">+ Grade CNC</button>
+                <button onclick="createCustomChecklist()" class="bg-[#323940] hover:bg-[#3c444d] text-[11px] px-2.5 py-1 rounded">+ Outro</button>
+              </div>
+            </div>
+            <div id="checklistsContainer" class="space-y-4"></div>
+          </div>
+
+        </div>
+
+        <!-- COLUNA DIREITA: COMENTÁRIOS E ATIVIDADE -->
+        <div class="md:col-span-5 p-5 bg-[#22272b]/60 flex flex-col max-h-[75vh]">
+          <h3 class="text-sm font-semibold text-white mb-3">💬 Comentários e atividade</h3>
+          <div class="flex gap-2 mb-4">
+            <input id="commentInput" type="text" placeholder="Escrever um comentário..." 
+              onkeydown="if(event.key==='Enter') addComment()"
+              class="flex-1 bg-[#1d2125] border border-gray-700 rounded px-3 py-1.5 text-xs text-white outline-none" />
+            <button onclick="addComment()" class="bg-blue-600 hover:bg-blue-500 text-white text-xs px-3 py-1.5 rounded font-semibold">Enviar</button>
+          </div>
+          <div id="activitiesContainer" class="flex-1 overflow-y-auto space-y-3 pr-1 text-xs"></div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    let columns = [];
+    let cards = [];
+    let checklists = [];
+    let checklistItems = [];
+    let currentCardId = null;
+
+    async function loadAllData() {
+      const [colRes, cardRes, chkRes, itemRes] = await Promise.all([
+        supabaseClient.from('kanban_columns').select('*').order('position'),
+        supabaseClient.from('kanban_cards').select('*').order('position'),
+        supabaseClient.from('card_checklists').select('*').order('position'),
+        supabaseClient.from('checklist_items').select('*').order('position')
+      ]);
+      columns = colRes.data || [];
+      cards = cardRes.data || [];
+      checklists = chkRes.data || [];
+      checklistItems = itemRes.data || [];
+      renderBoard();
+      if (currentCardId) openCardModal(currentCardId);
+    }
+
+    function renderBoard() {
+      const search = document.getElementById('searchInput').value.toLowerCase();
+      const board = document.getElementById('boardContainer');
+      board.innerHTML = '';
+
+      columns.forEach(col => {
+        const colCards = cards.filter(c => c.column_id === col.id && (
+          c.title.toLowerCase().includes(search) ||
+          (c.responsavel && c.responsavel.toLowerCase().includes(search))
+        ));
+
+        const colEl = document.createElement('div');
+        colEl.className = 'bg-[#101204] w-72 shrink-0 rounded-xl p-2.5 flex flex-col max-h-full border border-white/5 shadow-lg';
+        colEl.innerHTML = `
+          <div class="flex justify-between items-center px-2 py-1 mb-2">
+            <h2 class="font-bold text-xs text-gray-200 uppercase tracking-wider">${col.title}</h2>
+            <span class="bg-white/10 text-gray-300 text-[11px] px-2 py-0.5 rounded-full font-semibold">${colCards.length}</span>
+          </div>
+          <div class="card-list flex-1 overflow-y-auto space-y-2 pr-1 min-h-[40px]" data-col-id="${col.id}">
+            ${colCards.map(card => renderCardFront(card)).join('')}
+          </div>
+          <button onclick="createNewCard('${col.id}')" class="mt-2 text-left text-xs text-gray-400 hover:text-white hover:bg-white/5 px-2 py-1.5 rounded transition">
+            + Adicionar um cartão
+          </button>
+        `;
+        board.appendChild(colEl);
+
+        new Sortable(colEl.querySelector('.card-list'), {
+          group: 'kanban',
+          animation: 150,
+          onEnd: async (evt) => {
+            const cardId = evt.item.dataset.cardId;
+            const newColId = evt.to.dataset.colId;
+            const oldColId = evt.from.dataset.colId;
+            if (newColId !== oldColId) {
+              const oldCol = columns.find(c => c.id === oldColId)?.title || '';
+              const newCol = columns.find(c => c.id === newColId)?.title || '';
+              await supabaseClient.from('kanban_cards').update({ column_id: newColId, position: evt.newIndex }).eq('id', cardId);
+              await logActivity(cardId, `moveu este cartão de ${oldCol} para ${newCol}`);
+              loadAllData();
+            }
+          }
+        });
+      });
+    }
+
+    function renderCardFront(card) {
+      const cardChks = checklists.filter(ch => ch.card_id === card.id).map(ch => ch.id);
+      const items = checklistItems.filter(i => cardChks.includes(i.checklist_id));
+      const doneItems = items.filter(i => i.is_checked).length;
+
+      const dueBadge = card.due_date ? `
+        <span class="${card.is_completed ? 'bg-green-700 text-white' : 'bg-yellow-600/80 text-white'} text-[10px] px-1.5 py-0.5 rounded flex items-center gap-1 font-medium">
+          🕒 ${new Date(card.due_date).toLocaleDateString('pt-BR', {day:'2-digit', month:'short'})}
+        </span>` : '';
+
+      const chkBadge = items.length > 0 ? `
+        <span class="${doneItems === items.length ? 'bg-green-700 text-white' : 'bg-white/10 text-gray-300'} text-[10px] px-1.5 py-0.5 rounded font-medium">
+          ☑️ ${doneItems}/${items.length}
+        </span>` : '';
+
+      return `
+        <div onclick="openCardModal('${card.id}')" data-card-id="${card.id}" 
+          class="bg-[#22272b] hover:bg-[#2c333a] rounded-lg overflow-hidden cursor-pointer border border-gray-700/80 shadow transition">
+          ${card.cover_image_url ? `<img src="${card.cover_image_url}" class="w-full h-32 object-cover bg-white" />` : ''}
+          <div class="p-2.5 space-y-2">
+            <div class="text-xs font-bold text-white leading-snug">${card.title}</div>
+            
+            <div class="flex flex-wrap gap-1.5 items-center">
+              ${dueBadge}
+              ${chkBadge}
+            </div>
+
+            <div class="flex flex-wrap gap-1 pt-1 border-t border-gray-700/60 text-[10px] font-bold">
+              ${card.responsavel ? `<span class="bg-purple-700 text-white px-1.5 py-0.5 rounded"># RESPONSÁVEL: ${card.responsavel}</span>` : ''}
+              ${card.destino ? `<span class="bg-indigo-700 text-white px-1.5 py-0.5 rounded"># DESTINO: ${card.destino}</span>` : ''}
+              ${card.projeto ? `<span class="bg-green-700 text-white px-1.5 py-0.5 rounded"># PROJETO: ${card.projeto}</span>` : ''}
+              ${card.acabamento ? `<span class="bg-green-700 text-white px-1.5 py-0.5 rounded">ACABAMENTO: ${card.acabamento}</span>` : ''}
+              ${card.com_materiais ? `<span class="bg-green-700 text-white px-1.5 py-0.5 rounded">COM MATERIAIS: ${card.com_materiais}</span>` : ''}
+              ${card.equipe ? `<span class="bg-sky-700 text-white px-1.5 py-0.5 rounded">EQUIPE: ${card.equipe}</span>` : ''}
+              ${card.cadastro_cartao ? `<span class="bg-purple-900 text-purple-200 px-1.5 py-0.5 rounded">Cadastro/Cartão: ${card.cadastro_cartao}</span>` : ''}
+              ${card.especificacao ? `<span class="bg-emerald-800 text-emerald-200 px-1.5 py-0.5 rounded">☑ Especificação</span>` : ''}
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    async function createNewCard(colId) {
+      const title = prompt("Nome do cartão (Ex: FILA SPEEDLITE TRS - COLEÇÃO):");
+      if (!title) return;
+      const { data } = await supabaseClient.from('kanban_cards').insert({
+        column_id: colId, title, position: cards.length + 1
+      }).select().single();
+      if (data) {
+        const colName = columns.find(c => c.id === colId)?.title || '';
+        await logActivity(data.id, `adicionou este cartão a ${colName}`);
+        loadAllData();
+      }
+    }
+
+    async function addNewColumn() {
+      const title = prompt("Nome da nova coluna:");
+      if (!title) return;
+      await supabaseClient.from('kanban_columns').insert({ title: title.toUpperCase(), position: columns.length + 1 });
+      loadAllData();
+    }
+
+    async function openCardModal(cardId) {
+      currentCardId = cardId;
+      const card = cards.find(c => c.id === cardId);
+      if (!card) return;
+
+      document.getElementById('cardModal').classList.remove('hidden');
+      document.getElementById('cardModal').classList.add('flex');
+
+      const coverBox = document.getElementById('modalCoverContainer');
+      if (card.cover_image_url) {
+        coverBox.classList.remove('hidden');
+        document.getElementById('modalCoverImg').src = card.cover_image_url;
+      } else {
+        coverBox.classList.add('hidden');
+      }
+
+      document.getElementById('modalTitle').value = card.title || '';
+      document.getElementById('modalColumnName').innerText = columns.find(c => c.id === card.column_id)?.title || '';
+      document.getElementById('modalCompleted').checked = !!card.is_completed;
+      document.getElementById('modalDueDate').value = card.due_date ? card.due_date.slice(0, 16) : '';
+      document.getElementById('modalDescription').value = card.description || '';
+
+      document.getElementById('field_responsavel').value = card.responsavel || '';
+      document.getElementById('field_destino').value = card.destino || '';
+      document.getElementById('field_projeto').value = card.projeto || '';
+      document.getElementById('field_acabamento').value = card.acabamento || '';
+      document.getElementById('field_com_materiais').value = card.com_materiais || '';
+      document.getElementById('field_pos_mol').value = card.pos_mol || '';
+      document.getElementById('field_equipe').value = card.equipe || '';
+      document.getElementById('field_cadastro_cartao').value = card.cadastro_cartao || '';
+      document.getElementById('field_especificacao').checked = !!card.especificacao;
+
+      document.getElementById('syncDataPreview').innerHTML = `
+        Responsável: ${card.responsavel || '-'}<br/>
+        Destino: ${card.destino || '-'}<br/>
+        Equipe: ${card.equipe || '-'}
+      `;
+
+      renderModalChecklists(cardId);
+      loadCardActivities(cardId);
+    }
+
+    function closeModal() {
+      currentCardId = null;
+      document.getElementById('cardModal').classList.add('hidden');
+      document.getElementById('cardModal').classList.remove('flex');
+    }
+
+    async function saveCardField(field, value) {
+      if (!currentCardId) return;
+      await supabaseClient.from('kanban_cards').update({ [field]: value || null }).eq('id', currentCardId);
+      await logActivity(currentCardId, `atualizou o campo ${field}`);
+      loadAllData();
+    }
+
+    async function uploadCover(event) {
+      const file = event.target.files[0];
+      if (!file || !currentCardId) return;
+      const fileName = `${currentCardId}_${Date.now()}_${file.name}`;
+      const { error } = await supabaseClient.storage.from('anexos').upload(fileName, file);
+      if (error) return alert("Erro no upload: " + error.message);
+      const { data } = supabaseClient.storage.from('anexos').getPublicUrl(fileName);
+      await saveCardField('cover_image_url', data.publicUrl);
+    }
+
+    function renderModalChecklists(cardId) {
+      const container = document.getElementById('checklistsContainer');
+      const cardChks = checklists.filter(c => c.card_id === cardId);
+      container.innerHTML = cardChks.map(chk => {
+        const items = checklistItems.filter(i => i.checklist_id === chk.id);
+        const pct = items.length ? Math.round((items.filter(i => i.is_checked).length / items.length) * 100) : 0;
+        return `
+          <div class="bg-[#22272b] p-3 rounded-lg border border-gray-700">
+            <div class="flex justify-between items-center mb-1.5">
+              <span class="font-bold text-xs text-white">☑️ ${chk.title} (${pct}%)</span>
+              <button onclick="deleteChecklist('${chk.id}')" class="text-[11px] text-red-400 hover:underline">Excluir</button>
+            </div>
+            <div class="w-full bg-gray-700 h-1.5 rounded-full mb-2.5 overflow-hidden">
+              <div class="bg-green-500 h-1.5 transition-all" style="width:${pct}%"></div>
+            </div>
+            <div class="space-y-1.5 mb-2">
+              ${items.map(item => `
+                <label class="flex items-center gap-2 text-xs cursor-pointer hover:bg-white/5 p-1 rounded">
+                  <input type="checkbox" ${item.is_checked ? 'checked' : ''} onchange="toggleChecklistItem('${item.id}', '${item.content}', this.checked)" class="accent-green-500" />
+                  <span class="${item.is_checked ? 'line-through text-gray-500' : 'text-gray-200'}">${item.content}</span>
+                </label>
+              `).join('')}
+            </div>
+            <div class="flex gap-1.5">
+              <input id="newItem_${chk.id}" type="text" placeholder="Adicionar um item..." 
+                onkeydown="if(event.key==='Enter') addChecklistItem('${chk.id}')"
+                class="flex-1 bg-[#1d2125] border border-gray-700 rounded px-2 py-1 text-xs text-white outline-none" />
+              <button onclick="addChecklistItem('${chk.id}')" class="bg-white/10 hover:bg-white/20 text-xs px-2.5 py-1 rounded">Adicionar</button>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    async function createTemplateChecklist(type) {
+      if (!currentCardId) return;
+      const { data: chk } = await supabaseClient.from('card_checklists').insert({
+        card_id: currentCardId, title: type
+      }).select().single();
+      if (type === 'CNC' && chk) {
+        const grade = ['24/25 DIR - INF001','24/25 ESQ - INF002','26/27 DIR - INF003','26/27 ESQ - INF004','28/29 DIR - INF005','28/29 ESQ - INF006','30/31 DIR - INF007','30/31 ESQ - INF008','32/33 DIR - INF009','32/33 ESQ - INF010'];
+        await supabaseClient.from('checklist_items').insert(grade.map((g, idx) => ({ checklist_id: chk.id, content: g, position: idx })));
+      }
+      loadAllData();
+    }
+
+    async function createCustomChecklist() {
+      const title = prompt("Nome do Checklist (Ex: DADOS DE POSTIÇOS):");
+      if (!title || !currentCardId) return;
+      await supabaseClient.from('card_checklists').insert({ card_id: currentCardId, title: title.toUpperCase() });
+      loadAllData();
+    }
+
+    async function addChecklistItem(chkId) {
+      const input = document.getElementById(`newItem_${chkId}`);
+      if (!input.value.trim()) return;
+      await supabaseClient.from('checklist_items').insert({ checklist_id: chkId, content: input.value.trim() });
+      input.value = '';
+      loadAllData();
+    }
+
+    async function toggleChecklistItem(itemId, content, isChecked) {
+      const user = document.getElementById('currentUser').value;
+      await supabaseClient.from('checklist_items').update({ is_checked: isChecked, completed_by: user }).eq('id', itemId);
+      await logActivity(currentCardId, `${isChecked ? 'concluiu' : 'desmarcou'} ${content} neste cartão`);
+      loadAllData();
+    }
+
+    async function deleteChecklist(chkId) {
+      await supabaseClient.from('card_checklists').delete().eq('id', chkId);
+      loadAllData();
+    }
+
+    async function deleteCurrentCard() {
+      if (!confirm("Tem certeza que deseja excluir este cartão?")) return;
+      await supabaseClient.from('kanban_cards').delete().eq('id', currentCardId);
+      closeModal();
+      loadAllData();
+    }
+
+    async function logActivity(cardId, actionText, isComment = false) {
+      const user = document.getElementById('currentUser').value;
+      await supabaseClient.from('card_activities').insert({
+        card_id: cardId, user_name: user, action_text: actionText, is_comment: isComment
+      });
+    }
+
+    async function addComment() {
+      const input = document.getElementById('commentInput');
+      if (!input.value.trim() || !currentCardId) return;
+      await logActivity(currentCardId, input.value.trim(), true);
+      input.value = '';
+      loadCardActivities(currentCardId);
+    }
+
+    async function loadCardActivities(cardId) {
+      const { data } = await supabaseClient.from('card_activities').select('*').eq('card_id', cardId).order('created_at', { ascending: false });
+      const container = document.getElementById('activitiesContainer');
+      container.innerHTML = (data || []).map(act => `
+        <div class="border-b border-gray-700/50 pb-2">
+          <span class="font-bold text-blue-400">${act.user_name}</span> 
+          <span class="${act.is_comment ? 'block bg-[#1d2125] p-2 rounded mt-1 text-white' : 'text-gray-300'}">${act.action_text}</span>
+          <div class="text-[10px] text-gray-500 mt-0.5">${new Date(act.created_at).toLocaleString('pt-BR')}</div>
+        </div>
+      `).join('');
+    }
+
+    supabaseClient.channel('realtime-kanban')
+      .on('postgres_changes', { event: '*', schema: 'public' }, () => loadAllData())
+      .subscribe();
+
+    loadAllData();
+  </script>
+</body>
+</html>
