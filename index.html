@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="pt-PT" class="dark">
+<html lang="pt-BR" class="dark">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Gravasul OS 2030 — Kanban & PLM</title>
+  <title>Gravasul OS 2030 — Kanban</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js"></script>
@@ -13,12 +13,12 @@
     .mono { font-family: 'JetBrains Mono', monospace; }
     ::-webkit-scrollbar { width: 6px; height: 6px; }
     ::-webkit-scrollbar-track { background: rgba(0, 0, 0, 0.15); }
-    ::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.18); border-radius: 9999px; }
+    ::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.2); border-radius: 9999px; }
     ::-webkit-scrollbar-thumb:hover { background: rgba(56, 189, 248, 0.5); }
-    .glass { background: rgba(15, 23, 42, 0.72); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); }
-    .glass-col { background: rgba(11, 15, 25, 0.82); backdrop-filter: blur(16px); }
-    .glass-card { background: rgba(30, 41, 59, 0.65); backdrop-filter: blur(8px); }
-    .glass-card:hover { background: rgba(39, 53, 77, 0.85); transform: translateY(-2px); box-shadow: 0 12px 24px -8px rgba(0, 0, 0, 0.6), 0 0 15px -3px rgba(56, 189, 248, 0.2); }
+    .glass { background: rgba(15, 23, 42, 0.78); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); }
+    .glass-col { background: rgba(11, 15, 25, 0.88); backdrop-filter: blur(16px); }
+    .glass-card { background: rgba(30, 41, 59, 0.72); backdrop-filter: blur(8px); }
+    .glass-card:hover { background: rgba(39, 53, 77, 0.92); transform: translateY(-2px); box-shadow: 0 12px 24px -8px rgba(0, 0, 0, 0.6), 0 0 15px -3px rgba(56, 189, 248, 0.2); }
     .pan-area { cursor: grab; }
     .pan-area.panning { cursor: grabbing !important; }
     @media print {
@@ -30,39 +30,33 @@
 </head>
 <body class="bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-[#0b1b36] via-[#060d1a] to-[#02050a] text-slate-100 h-screen flex flex-col overflow-hidden select-none">
 
-  <script>
-    const SUPABASE_URL = "https://aqjvvsisknicgeouvojm.supabase.co";
-    const SUPABASE_KEY = "sb_publishable_TLbL9Hk1HoFKwlwSUNDbyQ_fIsnPQwl";
-  </script>
-
   <!-- TOPBAR FUTURISTA 2030 -->
-  <header class="glass border-b border-white/10 px-4 py-2.5 flex items-center justify-between gap-4 shrink-0 z-30">
-    <!-- Esquerda: Quadro e Vistas Premium -->
+  <header class="glass border-b border-white/10 px-4 py-2.5 flex items-center justify-between gap-3 shrink-0 z-30">
     <div class="flex items-center gap-3">
-      <button onclick="toggleBoardSwitcher()" class="flex items-center gap-2 bg-gradient-to-r from-cyan-500/20 to-blue-600/20 hover:from-cyan-500/30 hover:to-blue-600/30 border border-cyan-400/30 px-3 py-1.5 rounded-xl font-bold text-sm text-white shadow-sm transition">
-        <span class="w-2.5 h-2.5 rounded-full bg-cyan-400 animate-pulse"></span>
+      <button type="button" onclick="window.toggleBoardSwitcher()" class="flex items-center gap-2 bg-gradient-to-r from-cyan-500/20 to-blue-600/20 hover:from-cyan-500/30 hover:to-blue-600/30 border border-cyan-400/30 px-3 py-1.5 rounded-xl font-bold text-sm text-white shadow-sm transition cursor-pointer">
+        <span id="statusDot" class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
         <span id="currentBoardLabel">Gravasul | Prazos</span>
         <span class="text-xs text-cyan-300">▾</span>
       </button>
 
       <!-- Seletor de Vistas do Trello Premium -->
       <nav class="hidden lg:flex items-center bg-slate-900/80 p-1 rounded-xl border border-white/10 text-xs font-semibold">
-        <button onclick="switchMainView('board')" id="viewBtn_board" class="px-3 py-1.5 rounded-lg bg-cyan-500 text-slate-950 font-bold transition">📋 Quadro</button>
-        <button onclick="switchMainView('table')" id="viewBtn_table" class="px-3 py-1.5 rounded-lg text-slate-300 hover:text-white transition">📑 Tabela</button>
-        <button onclick="switchMainView('calendar')" id="viewBtn_calendar" class="px-3 py-1.5 rounded-lg text-slate-300 hover:text-white transition">📅 Calendário</button>
-        <button onclick="switchMainView('timeline')" id="viewBtn_timeline" class="px-3 py-1.5 rounded-lg text-slate-300 hover:text-white transition">⏳ Cronograma</button>
-        <button onclick="switchMainView('dashboard')" id="viewBtn_dashboard" class="px-3 py-1.5 rounded-lg text-slate-300 hover:text-white transition">📊 Painel</button>
+        <button type="button" onclick="window.switchMainView('board')" id="viewBtn_board" class="px-3 py-1.5 rounded-lg bg-cyan-500 text-slate-950 font-bold transition cursor-pointer">📋 Quadro</button>
+        <button type="button" onclick="window.switchMainView('table')" id="viewBtn_table" class="px-3 py-1.5 rounded-lg text-slate-300 hover:text-white transition cursor-pointer">📑 Tabela</button>
+        <button type="button" onclick="window.switchMainView('calendar')" id="viewBtn_calendar" class="px-3 py-1.5 rounded-lg text-slate-300 hover:text-white transition cursor-pointer">📅 Calendário</button>
+        <button type="button" onclick="window.switchMainView('timeline')" id="viewBtn_timeline" class="px-3 py-1.5 rounded-lg text-slate-300 hover:text-white transition cursor-pointer">⏳ Cronograma</button>
+        <button type="button" onclick="window.switchMainView('dashboard')" id="viewBtn_dashboard" class="px-3 py-1.5 rounded-lg text-slate-300 hover:text-white transition cursor-pointer">📊 Painel</button>
       </nav>
     </div>
 
-    <!-- Centro: Pesquisa Global Instantânea -->
+    <!-- Pesquisa Global -->
     <div class="flex items-center gap-2 flex-1 max-w-md">
       <div class="relative w-full">
-        <input id="searchInput" oninput="renderActiveView()" type="text" placeholder="Pesquisar matriz, coleção, responsável ou código..." 
+        <input id="searchInput" oninput="window.renderActiveView()" type="text" placeholder="Pesquisar matriz, coleção, responsável..." 
           class="w-full bg-slate-900/90 border border-white/10 focus:border-cyan-400/60 rounded-xl pl-8 pr-3 py-1.5 text-xs text-white placeholder-slate-400 outline-none transition" />
         <span class="absolute left-2.5 top-1.5 text-slate-400 text-xs">🔍</span>
       </div>
-      <select id="filterDestino" onchange="renderActiveView()" class="bg-slate-900/90 border border-white/10 rounded-xl px-2.5 py-1.5 text-xs text-slate-200 outline-none">
+      <select id="filterDestino" onchange="window.renderActiveView()" class="bg-slate-900/90 border border-white/10 rounded-xl px-2.5 py-1.5 text-xs text-slate-200 outline-none cursor-pointer">
         <option value="">Todos Destinos</option>
         <option value="MATRIZ">MATRIZ</option>
         <option value="TERCEIRO / PARCEIRO">TERCEIRO / PARCEIRO</option>
@@ -70,12 +64,9 @@
       </select>
     </div>
 
-    <!-- Direita: Avatares de Equipa, Arquivos e Nova Coluna -->
-    <div class="flex items-center gap-3">
-      <!-- Avatares Interativos (Clique para filtrar por pessoa) -->
+    <!-- Direita: Avatares, Usuário, Arquivo e Nova Lista -->
+    <div class="flex items-center gap-2.5">
       <div id="memberAvatars" class="hidden sm:flex items-center -space-x-1.5"></div>
-
-      <div class="h-5 w-[1px] bg-white/10"></div>
 
       <div class="flex items-center gap-1.5 bg-slate-900/80 border border-white/10 rounded-xl px-2.5 py-1">
         <span class="text-[10px] text-slate-400 uppercase tracking-wider">Ativo:</span>
@@ -91,96 +82,111 @@
         </select>
       </div>
 
-      <button onclick="openArchivedModal()" class="bg-white/5 hover:bg-white/15 border border-white/10 text-xs px-3 py-1.5 rounded-xl font-medium transition" title="Ver Cartões Arquivados">
+      <button type="button" onclick="window.openArchivedModal()" class="bg-white/5 hover:bg-white/15 border border-white/10 text-xs px-3 py-1.5 rounded-xl font-medium transition cursor-pointer">
         🗄️ Arquivo (<span id="archivedCount">0</span>)
       </button>
 
-      <button onclick="addNewColumn()" class="bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-slate-950 font-bold text-xs px-3.5 py-1.5 rounded-xl shadow-lg shadow-cyan-500/20 transition">
+      <button type="button" onclick="window.openNewColumnModal()" class="bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-slate-950 font-bold text-xs px-3.5 py-1.5 rounded-xl shadow-lg shadow-cyan-500/20 transition cursor-pointer">
         + Nova Lista
       </button>
     </div>
   </header>
 
-  <!-- ÁREA CENTRAL MULTI-PAINEL (Inbox + Planeador + Vista Principal) -->
+  <!-- ÁREA CENTRAL MULTI-PAINEL -->
   <div class="flex-1 flex overflow-hidden relative">
 
-    <!-- PAINEL LATERAL: CAIXA DE ENTRADA (INBOX) -->
+    <!-- PAINEL LATERAL: CAIXA DE ENTRADA -->
     <aside id="inboxPanel" class="hidden w-80 glass border-r border-white/10 flex-col p-4 shrink-0 z-20">
       <div class="flex items-center justify-between mb-3">
         <div class="flex items-center gap-2">
           <span class="text-lg">📥</span>
           <h2 class="font-bold text-sm text-white">Caixa de Entrada</h2>
         </div>
-        <button onclick="toggleDockPanel('inbox')" class="text-slate-400 hover:text-white text-sm">✕</button>
+        <button type="button" onclick="window.toggleDockPanel('inbox')" class="text-slate-400 hover:text-white text-sm cursor-pointer">✕</button>
       </div>
-      <p class="text-[11px] text-slate-400 mb-3">Regista matrizes ou tarefas rápidas aqui antes de as lançares na fila de projetos.</p>
+      <p class="text-[11px] text-slate-400 mb-3">Anote matrizes rápidas aqui antes de jogar para a Fila de Projetos.</p>
       <div class="flex gap-1.5 mb-4">
-        <input id="inboxInput" type="text" placeholder="Adicionar cartão rápido..." onkeydown="if(event.key==='Enter') addInboxCard()"
+        <input id="inboxInput" type="text" placeholder="Digite o nome do cartão..." onkeydown="if(event.key==='Enter') window.addInboxCard()"
           class="flex-1 bg-slate-900/90 border border-white/10 rounded-xl px-3 py-2 text-xs text-white outline-none focus:border-cyan-400" />
-        <button onclick="addInboxCard()" class="bg-cyan-500 text-slate-950 font-bold text-xs px-3 rounded-xl">+</button>
+        <button type="button" onclick="window.addInboxCard()" class="bg-cyan-500 text-slate-950 font-bold text-xs px-3 rounded-xl cursor-pointer">+</button>
       </div>
       <div id="inboxList" class="flex-1 overflow-y-auto space-y-2 pr-1"></div>
     </aside>
 
-    <!-- PAINEL LATERAL: PLANEADOR / AGENDA DIÁRIA -->
+    <!-- PAINEL LATERAL: PLANEADOR DIÁRIO -->
     <aside id="plannerPanel" class="hidden w-80 glass border-r border-white/10 flex-col p-4 shrink-0 z-20">
       <div class="flex items-center justify-between mb-3">
         <div class="flex items-center gap-2">
           <span class="text-lg">🗓️</span>
           <h2 class="font-bold text-sm text-white">Planeador & Agenda</h2>
         </div>
-        <button onclick="toggleDockPanel('planner')" class="text-slate-400 hover:text-white text-sm">✕</button>
+        <button type="button" onclick="window.toggleDockPanel('planner')" class="text-slate-400 hover:text-white text-sm cursor-pointer">✕</button>
       </div>
-      <p class="text-[11px] text-slate-400 mb-3">Prazos de entrega organizados por dia (Hoje, Amanhã e próximos dias).</p>
-      <div id="plannerList" class="flex-1 overflow-y-auto space-y-4 pr-1"></div>
+      <p class="text-[11px] text-slate-400 mb-3">Entregas agendadas organizadas por data.</p>
+      <div id="plannerList" class="flex-1 overflow-y-auto space-y-3 pr-1"></div>
     </aside>
 
-    <!-- 1. VISTA QUADRO KANBAN (Com Drag-to-Scroll clicando no fundo!) -->
+    <!-- 1. VISTA QUADRO KANBAN (Arraste clicando no fundo!) -->
     <main id="boardContainer" class="pan-area flex-1 flex gap-3.5 p-4 overflow-x-auto items-start pb-20"></main>
 
-    <!-- 2. VISTA TABELA (TRELLO PREMIUM TABLE VIEW) -->
+    <!-- 2. VISTA TABELA -->
     <main id="tableViewContainer" class="hidden flex-1 p-6 overflow-auto pb-24"></main>
 
-    <!-- 3. VISTA CALENDÁRIO (TRELLO PREMIUM CALENDAR VIEW) -->
+    <!-- 3. VISTA CALENDÁRIO -->
     <main id="calendarViewContainer" class="hidden flex-1 p-6 overflow-auto pb-24"></main>
 
-    <!-- 4. VISTA CRONOGRAMA / TIMELINE (TRELLO PREMIUM TIMELINE) -->
+    <!-- 4. VISTA CRONOGRAMA -->
     <main id="timelineViewContainer" class="hidden flex-1 p-6 overflow-auto pb-24"></main>
 
-    <!-- 5. VISTA PAINEL / ANALYTICS (TRELLO PREMIUM DASHBOARD) -->
+    <!-- 5. VISTA PAINEL (DASHBOARD) -->
     <main id="dashboardViewContainer" class="hidden flex-1 p-6 overflow-auto pb-24"></main>
-
   </div>
 
-  <!-- DOCK FLUTUANTE INFERIOR (Igual ao vídeo do Trello, versão 2030) -->
+  <!-- DOCK FLUTUANTE INFERIOR -->
   <div class="fixed bottom-4 left-1/2 -translate-x-1/2 z-30 flex items-center gap-1.5 glass px-3 py-2 rounded-2xl border border-white/15 shadow-2xl shadow-black/80">
-    <button onclick="toggleDockPanel('inbox')" id="dock_inbox" class="flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs font-semibold text-slate-300 hover:text-white hover:bg-white/10 transition">
+    <button type="button" onclick="window.toggleDockPanel('inbox')" id="dock_inbox" class="flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs font-semibold text-slate-300 hover:text-white hover:bg-white/10 transition cursor-pointer">
       <span>📥</span> Caixa de entrada
     </button>
-    <button onclick="toggleDockPanel('planner')" id="dock_planner" class="flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs font-semibold text-slate-300 hover:text-white hover:bg-white/10 transition">
+    <button type="button" onclick="window.toggleDockPanel('planner')" id="dock_planner" class="flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs font-semibold text-slate-300 hover:text-white hover:bg-white/10 transition cursor-pointer">
       <span>🗓️</span> Planeador
     </button>
-    <button onclick="switchMainView('board')" id="dock_board" class="flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs font-bold bg-cyan-500/20 text-cyan-300 border border-cyan-400/30 transition">
+    <button type="button" onclick="window.switchMainView('board')" id="dock_board" class="flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs font-bold bg-cyan-500/20 text-cyan-300 border border-cyan-400/30 transition cursor-pointer">
       <span>📋</span> Quadro
     </button>
     <div class="h-4 w-[1px] bg-white/15 mx-1"></div>
-    <button onclick="toggleBoardSwitcher()" class="flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs font-semibold text-slate-300 hover:text-white hover:bg-white/10 transition">
+    <button type="button" onclick="window.toggleBoardSwitcher()" class="flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs font-semibold text-slate-300 hover:text-white hover:bg-white/10 transition cursor-pointer">
       <span>🔄</span> Mudar de quadro
     </button>
   </div>
 
-  <!-- MODAL: MUDAR DE QUADRO (BOARD SWITCHER) -->
+  <!-- MODAL: NOVA LISTA (Substitui o prompt bloqueado) -->
+  <div id="newColumnModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm hidden items-center justify-center z-50">
+    <div class="glass border border-white/15 w-full max-w-sm rounded-2xl p-5 shadow-2xl">
+      <div class="flex justify-between items-center mb-3">
+        <h3 class="font-bold text-white text-sm">+ Adicionar Nova Lista</h3>
+        <button type="button" onclick="window.closeNewColumnModal()" class="text-slate-400 hover:text-white cursor-pointer">✕</button>
+      </div>
+      <input id="newColumnInput" type="text" placeholder="Ex: REVISÃO DE QUALIDADE" onkeydown="if(event.key==='Enter') window.confirmAddNewColumn()"
+        class="w-full bg-slate-900 border border-white/10 rounded-xl px-3 py-2 text-xs text-white outline-none mb-3" />
+      <div class="flex justify-end gap-2">
+        <button type="button" onclick="window.closeNewColumnModal()" class="px-3 py-1.5 rounded-xl text-xs text-slate-400 hover:text-white cursor-pointer">Cancelar</button>
+        <button type="button" onclick="window.confirmAddNewColumn()" class="bg-cyan-500 text-slate-950 font-bold text-xs px-4 py-1.5 rounded-xl cursor-pointer">Criar Lista</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: MUDAR DE QUADRO -->
   <div id="boardSwitcherModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm hidden items-center justify-center z-50">
     <div class="glass border border-white/15 w-full max-w-md rounded-2xl p-5 shadow-2xl">
       <div class="flex justify-between items-center mb-4">
         <h3 class="font-bold text-white text-sm">🔄 Selecionar ou Criar Quadro</h3>
-        <button onclick="toggleBoardSwitcher()" class="text-slate-400 hover:text-white">✕</button>
+        <button type="button" onclick="window.toggleBoardSwitcher()" class="text-slate-400 hover:text-white cursor-pointer">✕</button>
       </div>
       <div id="boardsList" class="space-y-2 mb-4"></div>
       <div class="flex gap-2 pt-3 border-t border-white/10">
-        <input id="newBoardName" type="text" placeholder="Nome do novo quadro (Ex: Gravasul - Navalhas)..." 
+        <input id="newBoardName" type="text" placeholder="Nome do novo quadro (Ex: Gravasul - Freq)..." 
           class="flex-1 bg-slate-900 border border-white/10 rounded-xl px-3 py-2 text-xs text-white outline-none" />
-        <button onclick="createNewBoard()" class="bg-cyan-500 text-slate-950 font-bold text-xs px-4 rounded-xl">Criar</button>
+        <button type="button" onclick="window.createNewBoard()" class="bg-cyan-500 text-slate-950 font-bold text-xs px-4 rounded-xl cursor-pointer">Criar</button>
       </div>
     </div>
   </div>
@@ -190,7 +196,7 @@
     <div class="glass border border-white/15 w-full max-w-2xl rounded-2xl p-5 shadow-2xl max-h-[80vh] flex flex-col">
       <div class="flex justify-between items-center mb-4">
         <h3 class="font-bold text-white text-sm">🗄️ Cartões Arquivados</h3>
-        <button onclick="closeArchivedModal()" class="text-slate-400 hover:text-white">✕</button>
+        <button type="button" onclick="window.closeArchivedModal()" class="text-slate-400 hover:text-white cursor-pointer">✕</button>
       </div>
       <div id="archivedCardsList" class="flex-1 overflow-y-auto space-y-2 pr-1"></div>
     </div>
@@ -200,20 +206,20 @@
   <div id="cardModal" class="fixed inset-0 bg-black/80 backdrop-blur-md hidden items-start justify-center overflow-y-auto py-8 z-50">
     <div class="bg-[#141a26] w-full max-w-5xl rounded-2xl shadow-2xl border border-white/15 overflow-hidden text-slate-200 my-auto">
 
-      <!-- AVISO DE CARTÃO ARQUIVADO (Igual ao vídeo 00:42) -->
+      <!-- AVISO DE CARTÃO ARQUIVADO -->
       <div id="archivedBanner" class="hidden bg-amber-500/20 border-b border-amber-500/40 px-5 py-2.5 items-center justify-between text-xs text-amber-200">
         <span>🗄️ <b>Este cartão está arquivado.</b></span>
         <div class="flex gap-2">
-          <button onclick="toggleArchiveCurrentCard(false)" class="bg-amber-400 text-slate-950 font-bold px-3 py-1 rounded-lg">↩️ Enviar ao quadro</button>
-          <button onclick="deleteCurrentCard()" class="bg-red-500/30 hover:bg-red-500/50 text-red-200 px-3 py-1 rounded-lg">Excluir permanentemente</button>
+          <button type="button" onclick="window.toggleArchiveCurrentCard(false)" class="bg-amber-400 text-slate-950 font-bold px-3 py-1 rounded-lg cursor-pointer">↩️ Enviar ao quadro</button>
+          <button type="button" onclick="window.deleteCurrentCard()" class="bg-red-500/30 hover:bg-red-500/50 text-red-200 px-3 py-1 rounded-lg cursor-pointer">Excluir permanentemente</button>
         </div>
       </div>
 
-      <!-- BARRA DE TOPO DO MODAL (Seletor de Coluna + Capa + Menu •••) -->
+      <!-- TOPO DO MODAL -->
       <div class="bg-[#0d121c] px-5 py-3 flex items-center justify-between border-b border-white/10">
         <div class="flex items-center gap-2">
           <span class="text-xs text-slate-400">Lista:</span>
-          <select id="modalColumnSelect" onchange="moveCurrentCardToColumn(this.value)" 
+          <select id="modalColumnSelect" onchange="window.moveCurrentCardToColumn(this.value)" 
             class="bg-slate-800 hover:bg-slate-700 text-xs font-bold text-cyan-300 px-3 py-1.5 rounded-lg border border-white/10 outline-none cursor-pointer"></select>
           <span id="templateBadge" class="hidden bg-cyan-500/20 border border-cyan-400/40 text-cyan-300 text-[11px] px-2.5 py-0.5 rounded-full font-bold">📋 TEMPLATE</span>
         </div>
@@ -221,95 +227,80 @@
         <div class="flex items-center gap-2 relative">
           <label class="bg-slate-800 hover:bg-slate-700 text-xs px-3 py-1.5 rounded-lg cursor-pointer font-medium border border-white/10 transition">
             🖼️ Capa / Anexo 3D
-            <input type="file" accept="image/*" class="hidden" onchange="uploadAttachment(event, true)" />
+            <input type="file" accept="image/*" class="hidden" onchange="window.uploadAttachment(event, true)" />
           </label>
 
-          <!-- Botão Menu ••• (Igual ao vídeo 00:26 e 00:41) -->
-          <button onclick="toggleCardActionsMenu()" class="bg-slate-800 hover:bg-slate-700 text-white px-3 py-1.5 rounded-lg text-xs font-bold border border-white/10">
+          <button type="button" onclick="window.toggleCardActionsMenu()" class="bg-slate-800 hover:bg-slate-700 text-white px-3 py-1.5 rounded-lg text-xs font-bold border border-white/10 cursor-pointer">
             ••• Ações
           </button>
 
-          <!-- Dropdown de Ações do Cartão -->
+          <!-- Dropdown de Ações -->
           <div id="cardActionsDropdown" class="hidden absolute right-10 top-10 w-64 bg-[#1c2433] border border-white/15 rounded-xl shadow-2xl p-2 z-50 text-xs space-y-1">
             <div class="text-[10px] font-bold uppercase text-slate-400 px-2 py-1">Ações do Cartão</div>
-            <button onclick="joinCard()" class="w-full text-left px-3 py-2 rounded-lg hover:bg-white/10 flex items-center gap-2">👤 Ingressar no cartão</button>
-            <button onclick="openCopyCardPane()" class="w-full text-left px-3 py-2 rounded-lg hover:bg-white/10 flex items-center gap-2">📋 Copiar cartão...</button>
-            <button onclick="toggleTemplateCurrentCard()" class="w-full text-left px-3 py-2 rounded-lg hover:bg-white/10 flex items-center gap-2">✨ Transformar em Template</button>
-            <button onclick="window.print()" class="w-full text-left px-3 py-2 rounded-lg hover:bg-white/10 flex items-center gap-2">🖨️ Imprimir / Exportar PDF</button>
-            <button onclick="copyCardLink()" class="w-full text-left px-3 py-2 rounded-lg hover:bg-white/10 flex items-center gap-2">🔗 Partilhar link</button>
+            <button type="button" onclick="window.joinCard()" class="w-full text-left px-3 py-2 rounded-lg hover:bg-white/10 flex items-center gap-2 cursor-pointer">👤 Ingressar no cartão</button>
+            <button type="button" onclick="window.openCopyCardPane()" class="w-full text-left px-3 py-2 rounded-lg hover:bg-white/10 flex items-center gap-2 cursor-pointer">📋 Copiar cartão...</button>
+            <button type="button" onclick="window.toggleTemplateCurrentCard()" class="w-full text-left px-3 py-2 rounded-lg hover:bg-white/10 flex items-center gap-2 cursor-pointer">✨ Transformar em Template</button>
+            <button type="button" onclick="window.print()" class="w-full text-left px-3 py-2 rounded-lg hover:bg-white/10 flex items-center gap-2 cursor-pointer">🖨️ Imprimir / PDF</button>
             <div class="border-t border-white/10 my-1"></div>
-            <button onclick="toggleArchiveCurrentCard(true)" class="w-full text-left px-3 py-2 rounded-lg hover:bg-amber-500/20 text-amber-300 flex items-center gap-2">🗄️ Arquivar cartão</button>
-            <button onclick="deleteCurrentCard()" class="w-full text-left px-3 py-2 rounded-lg hover:bg-red-500/20 text-red-400 flex items-center gap-2">🗑️ Excluir permanentemente</button>
+            <button type="button" onclick="window.toggleArchiveCurrentCard(true)" class="w-full text-left px-3 py-2 rounded-lg hover:bg-amber-500/20 text-amber-300 flex items-center gap-2 cursor-pointer">🗄️ Arquivar cartão</button>
+            <button type="button" onclick="window.deleteCurrentCard()" class="w-full text-left px-3 py-2 rounded-lg hover:bg-red-500/20 text-red-400 flex items-center gap-2 cursor-pointer">🗑️ Excluir cartão</button>
           </div>
 
-          <!-- Popover Copiar Cartão (Igual ao vídeo 00:27) -->
+          <!-- Popover Copiar Cartão -->
           <div id="copyCardPopover" class="hidden absolute right-10 top-10 w-72 bg-[#1c2433] border border-white/15 rounded-xl shadow-2xl p-3.5 z-50 text-xs space-y-3">
             <div class="flex justify-between items-center border-b border-white/10 pb-2">
               <span class="font-bold text-white">Copiar cartão</span>
-              <button onclick="document.getElementById('copyCardPopover').classList.add('hidden')" class="text-slate-400">✕</button>
+              <button type="button" onclick="document.getElementById('copyCardPopover').classList.add('hidden')" class="text-slate-400 cursor-pointer">✕</button>
             </div>
             <div>
               <label class="text-[11px] text-slate-400 block mb-1">Nome</label>
               <textarea id="copyCardTitle" rows="2" class="w-full bg-slate-900 border border-white/10 rounded-lg p-2 text-xs text-white outline-none"></textarea>
             </div>
             <div class="space-y-1">
-              <div class="text-[11px] text-slate-400">Manter...</div>
-              <label class="flex items-center gap-2"><input type="checkbox" id="copyKeepChecklists" checked class="accent-cyan-400" /> Checklists</label>
-              <label class="flex items-center gap-2"><input type="checkbox" id="copyKeepAttachments" checked class="accent-cyan-400" /> Anexos e Capa 3D</label>
+              <label class="flex items-center gap-2"><input type="checkbox" id="copyKeepChecklists" checked class="accent-cyan-400" /> Manter Checklists</label>
+              <label class="flex items-center gap-2"><input type="checkbox" id="copyKeepAttachments" checked class="accent-cyan-400" /> Manter Capa 3D e Anexos</label>
             </div>
             <div>
               <label class="text-[11px] text-slate-400 block mb-1">Copiar para a lista</label>
               <select id="copyCardTargetCol" class="w-full bg-slate-900 border border-white/10 rounded-lg p-2 text-xs text-white outline-none"></select>
             </div>
-            <button onclick="confirmCopyCard()" class="w-full bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold py-2 rounded-lg">Criar cartão</button>
+            <button type="button" onclick="window.confirmCopyCard()" class="w-full bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold py-2 rounded-lg cursor-pointer">Criar cópia</button>
           </div>
 
-          <button onclick="closeModal()" class="text-slate-400 hover:text-white text-lg px-2 font-bold">✕</button>
+          <button type="button" onclick="window.closeModal()" class="text-slate-400 hover:text-white text-lg px-2 font-bold cursor-pointer">✕</button>
         </div>
       </div>
 
-      <!-- CAPA 3D CENTRALIZADA -->
+      <!-- CAPA 3D -->
       <div id="modalCoverContainer" class="bg-[#0b0f17] relative flex justify-center items-center max-h-60 overflow-hidden border-b border-white/10 hidden">
         <img id="modalCoverImg" src="" class="max-h-56 object-contain py-3" />
       </div>
 
-      <!-- CORPO DO MODAL (2 COLUNAS) -->
+      <!-- CORPO DO MODAL -->
       <div class="grid grid-cols-1 lg:grid-cols-12">
-
-        <!-- COLUNA ESQUERDA: DADOS, AMAZING FIELDS, ANEXOS E CHECKLISTS -->
         <div class="lg:col-span-7 p-6 space-y-6 border-r border-white/10">
-
-          <!-- TÍTULO + BADGES RÁPIDOS -->
           <div>
-            <input id="modalTitle" onchange="saveCardField('title', this.value)" 
+            <input id="modalTitle" onchange="window.saveCardField('title', this.value)" 
               class="bg-transparent text-xl font-extrabold text-white w-full focus:bg-slate-900 px-2.5 py-1.5 rounded-xl outline-none border border-transparent focus:border-cyan-500/40" />
             
-            <!-- Botões de ação rápida abaixo do título (Igual ao vídeo 00:46) -->
             <div class="flex flex-wrap items-center gap-2 mt-3">
               <div class="flex items-center gap-2 bg-slate-900/90 px-3 py-1.5 rounded-xl border border-white/10">
-                <input type="checkbox" id="modalCompleted" onchange="saveCardField('is_completed', this.checked)" class="w-4 h-4 accent-emerald-500 cursor-pointer" />
+                <input type="checkbox" id="modalCompleted" onchange="window.saveCardField('is_completed', this.checked)" class="w-4 h-4 accent-emerald-500 cursor-pointer" />
                 <span class="text-[11px] text-slate-400 font-semibold">Entrega:</span>
-                <input type="datetime-local" id="modalDueDate" onchange="saveCardField('due_date', this.value)" class="bg-transparent text-xs text-white outline-none" />
+                <input type="datetime-local" id="modalDueDate" onchange="window.saveCardField('due_date', this.value)" class="bg-transparent text-xs text-white outline-none" />
               </div>
 
-              <button onclick="openCopyChecklistPrompt()" class="bg-slate-800/80 hover:bg-slate-700 border border-white/10 text-xs px-3 py-1.5 rounded-xl font-medium">
-                ☑️ Copiar Checklist de...
-              </button>
-
               <label class="bg-slate-800/80 hover:bg-slate-700 border border-white/10 text-xs px-3 py-1.5 rounded-xl font-medium cursor-pointer">
-                📎 Anexar Ficheiro
-                <input type="file" class="hidden" onchange="uploadAttachment(event, false)" />
+                📎 Anexar Arquivo
+                <input type="file" class="hidden" onchange="window.uploadAttachment(event, false)" />
               </label>
             </div>
           </div>
 
-          <!-- DESCRIÇÃO + DADOS SINCRONIZADOS AUTOMÁTICOS -->
+          <!-- DESCRIÇÃO + DADOS SINCRONIZADOS -->
           <div>
-            <div class="flex justify-between items-center mb-1.5">
-              <label class="text-xs font-bold uppercase tracking-wider text-slate-300">☰ Especificações / Descrição Técnica</label>
-              <span class="text-[11px] text-slate-400">Guarda automaticamente</span>
-            </div>
-            <textarea id="modalDescription" onchange="saveCardField('description', this.value)" rows="4" 
+            <label class="text-xs font-bold uppercase tracking-wider text-slate-300 block mb-1.5">☰ Descrição / Especificações</label>
+            <textarea id="modalDescription" onchange="window.saveCardField('description', this.value)" rows="4" 
               placeholder="Ex: BASE P435 | N°: M15580 M15581 | PNEU E.V | CNC 2..."
               class="w-full bg-slate-900/90 border border-white/10 rounded-xl p-3 text-xs text-white focus:border-cyan-400 outline-none leading-relaxed mono"></textarea>
             
@@ -318,34 +309,29 @@
                 <div class="font-bold text-cyan-400 mb-1">⚙️ Dados Sincronizados:</div>
                 <div id="syncDataPreview" class="space-y-0.5 text-[11px]"></div>
               </div>
-              <button onclick="copySyncData()" class="bg-white/5 hover:bg-white/10 border border-white/10 px-2.5 py-1.5 rounded-lg text-[11px] text-slate-300">📋 Copiar</button>
+              <button type="button" onclick="window.copySyncData()" class="bg-white/5 hover:bg-white/10 border border-white/10 px-2.5 py-1.5 rounded-lg text-[11px] text-slate-300 cursor-pointer">📋 Copiar</button>
             </div>
           </div>
 
-          <!-- AMAZING FIELDS NATIVO (Com todas as opções dos vídeos) -->
+          <!-- AMAZING FIELDS -->
           <div>
             <div class="flex items-center justify-between mb-2">
               <h3 class="text-xs font-bold uppercase tracking-wider text-slate-300">📊 Amazing Fields (Campos da Matriz)</h3>
-              <span class="text-[11px] text-cyan-400">Visível na frente do cartão</span>
+              <span class="text-[11px] text-cyan-400">Visível na capa</span>
             </div>
             <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 bg-slate-900/70 p-4 rounded-2xl border border-white/10">
               <div>
                 <label class="text-[10px] font-bold text-slate-400 block mb-1"># RESPONSÁVEL</label>
-                <input id="field_responsavel" list="responsaveis_list" onchange="saveCardField('responsavel', this.value.toUpperCase())" placeholder="Ex: LUCAS OLIVEIRA"
+                <input id="field_responsavel" list="responsaveis_list" onchange="window.saveCardField('responsavel', this.value.toUpperCase())" placeholder="Ex: LUCAS OLIVEIRA"
                   class="w-full bg-purple-700/90 text-white font-bold text-xs px-2.5 py-2 rounded-lg outline-none placeholder-purple-300 border border-purple-400/30" />
                 <datalist id="responsaveis_list">
-                  <option value="BRUNO"></option>
-                  <option value="JACARÉ"></option>
-                  <option value="DJOW"></option>
-                  <option value="DOUGLAS"></option>
-                  <option value="LUCAS OLIVEIRA"></option>
-                  <option value="IGOR NUNES"></option>
-                  <option value="JULLY CNC"></option>
+                  <option value="BRUNO"></option><option value="JACARÉ"></option><option value="DJOW"></option>
+                  <option value="DOUGLAS"></option><option value="LUCAS OLIVEIRA"></option><option value="IGOR NUNES"></option><option value="JULLY CNC"></option>
                 </datalist>
               </div>
               <div>
                 <label class="text-[10px] font-bold text-slate-400 block mb-1"># DESTINO</label>
-                <select id="field_destino" onchange="saveCardField('destino', this.value)" class="w-full bg-indigo-700/90 text-white font-bold text-xs px-2.5 py-2 rounded-lg outline-none border border-indigo-400/30">
+                <select id="field_destino" onchange="window.saveCardField('destino', this.value)" class="w-full bg-indigo-700/90 text-white font-bold text-xs px-2.5 py-2 rounded-lg outline-none border border-indigo-400/30">
                   <option value="">--</option>
                   <option value="MATRIZ">MATRIZ</option>
                   <option value="TERCEIRO / PARCEIRO">TERCEIRO / PARCEIRO</option>
@@ -355,190 +341,249 @@
               </div>
               <div>
                 <label class="text-[10px] font-bold text-slate-400 block mb-1"># PROJETO</label>
-                <select id="field_projeto" onchange="saveCardField('projeto', this.value)" class="w-full bg-emerald-700/90 text-white font-bold text-xs px-2.5 py-2 rounded-lg outline-none border border-emerald-400/30">
+                <select id="field_projeto" onchange="window.saveCardField('projeto', this.value)" class="w-full bg-emerald-700/90 text-white font-bold text-xs px-2.5 py-2 rounded-lg outline-none border border-emerald-400/30">
                   <option value="">--</option><option value="S1">S1</option><option value="S2">S2</option><option value="S3">S3</option><option value="S4">S4</option><option value="S5">S5</option><option value="S6">S6</option>
                 </select>
               </div>
               <div>
                 <label class="text-[10px] font-bold text-slate-400 block mb-1">ACABAMENTO</label>
-                <select id="field_acabamento" onchange="saveCardField('acabamento', this.value)" class="w-full bg-emerald-700/90 text-white font-bold text-xs px-2.5 py-2 rounded-lg outline-none border border-emerald-400/30">
+                <select id="field_acabamento" onchange="window.saveCardField('acabamento', this.value)" class="w-full bg-emerald-700/90 text-white font-bold text-xs px-2.5 py-2 rounded-lg outline-none border border-emerald-400/30">
                   <option value="">--</option><option value="S1">S1</option><option value="S2">S2</option><option value="S3">S3</option><option value="S4">S4</option><option value="S5">S5</option><option value="S6">S6</option>
                 </select>
               </div>
               <div>
                 <label class="text-[10px] font-bold text-slate-400 block mb-1">COM MATERIAIS</label>
-                <select id="field_com_materiais" onchange="saveCardField('com_materiais', this.value)" class="w-full bg-emerald-700/90 text-white font-bold text-xs px-2.5 py-2 rounded-lg outline-none border border-emerald-400/30">
+                <select id="field_com_materiais" onchange="window.saveCardField('com_materiais', this.value)" class="w-full bg-emerald-700/90 text-white font-bold text-xs px-2.5 py-2 rounded-lg outline-none border border-emerald-400/30">
                   <option value="">--</option><option value="S1">S1</option><option value="S2">S2</option><option value="S3">S3</option><option value="S4">S4</option><option value="S5">S5</option><option value="S6">S6</option>
                 </select>
               </div>
               <div>
                 <label class="text-[10px] font-bold text-slate-400 block mb-1">Pos. Mol.</label>
-                <input id="field_pos_mol" onchange="saveCardField('pos_mol', this.value)" placeholder="Pos. Mol."
+                <input id="field_pos_mol" onchange="window.saveCardField('pos_mol', this.value)" placeholder="Pos. Mol."
                   class="w-full bg-slate-950 border border-white/15 text-white text-xs px-2.5 py-2 rounded-lg outline-none" />
               </div>
               <div>
                 <label class="text-[10px] font-bold text-slate-400 block mb-1">EQUIPE</label>
-                <select id="field_equipe" onchange="saveCardField('equipe', this.value)" class="w-full bg-sky-700/90 text-white font-bold text-xs px-2.5 py-2 rounded-lg outline-none border border-sky-400/30">
+                <select id="field_equipe" onchange="window.saveCardField('equipe', this.value)" class="w-full bg-sky-700/90 text-white font-bold text-xs px-2.5 py-2 rounded-lg outline-none border border-sky-400/30">
                   <option value="">--</option><option value="CAD">CAD</option><option value="CAM">CAM</option><option value="CNC">CNC</option><option value="FACAS">FACAS</option><option value="POSTIÇOS">POSTIÇOS</option>
                 </select>
               </div>
               <div>
                 <label class="text-[10px] font-bold text-slate-400 block mb-1">Cadastro/Cartão</label>
-                <select id="field_cadastro_cartao" onchange="saveCardField('cadastro_cartao', this.value)" class="w-full bg-purple-900/90 text-white font-bold text-xs px-2.5 py-2 rounded-lg outline-none border border-purple-400/30">
+                <select id="field_cadastro_cartao" onchange="window.saveCardField('cadastro_cartao', this.value)" class="w-full bg-purple-900/90 text-white font-bold text-xs px-2.5 py-2 rounded-lg outline-none border border-purple-400/30">
                   <option value="">--</option><option value="S1">S1</option><option value="S2">S2</option><option value="S3">S3</option><option value="S4">S4</option>
                 </select>
               </div>
               <div class="flex items-center gap-2 pt-5">
-                <input type="checkbox" id="field_especificacao" onchange="saveCardField('especificacao', this.checked)" class="w-4 h-4 accent-emerald-500 cursor-pointer" />
+                <input type="checkbox" id="field_especificacao" onchange="window.saveCardField('especificacao', this.checked)" class="w-4 h-4 accent-emerald-500 cursor-pointer" />
                 <label for="field_especificacao" class="text-xs font-bold text-white cursor-pointer">Especificação</label>
               </div>
             </div>
           </div>
 
-          <!-- GALERIA DE ANEXOS (Igual ao vídeo 00:19) -->
+          <!-- GALERIA DE ANEXOS -->
           <div>
             <div class="flex items-center justify-between mb-2">
               <h3 class="text-xs font-bold uppercase tracking-wider text-slate-300">📎 Anexos (<span id="attachmentsCount">0</span>)</h3>
               <label class="bg-white/5 hover:bg-white/10 border border-white/10 text-[11px] px-2.5 py-1 rounded-lg cursor-pointer">
                 + Adicionar Anexo
-                <input type="file" class="hidden" onchange="uploadAttachment(event, false)" />
+                <input type="file" class="hidden" onchange="window.uploadAttachment(event, false)" />
               </label>
             </div>
             <div id="attachmentsContainer" class="space-y-2"></div>
           </div>
 
-          <!-- CHECKLISTS COM OCULTAR CONCLUÍDOS E TEMPLATES -->
+          <!-- CHECKLISTS -->
           <div>
             <div class="flex flex-wrap items-center justify-between gap-2 mb-2.5">
               <h3 class="text-xs font-bold uppercase tracking-wider text-slate-300">☑️ Checklists de Produção</h3>
               <div class="flex flex-wrap gap-1.5">
-                <button onclick="createTemplateChecklist('CAD')" class="bg-slate-800 hover:bg-slate-700 border border-white/10 text-[11px] px-2.5 py-1 rounded-lg">+ CAD</button>
-                <button onclick="createTemplateChecklist('CAM')" class="bg-slate-800 hover:bg-slate-700 border border-white/10 text-[11px] px-2.5 py-1 rounded-lg">+ CAM</button>
-                <button onclick="createTemplateChecklist('CNC')" class="bg-purple-600 hover:bg-purple-500 text-white text-[11px] px-2.5 py-1 rounded-lg font-bold">+ Grade CNC</button>
-                <button onclick="createTemplateChecklist('POSTIÇOS')" class="bg-sky-600 hover:bg-sky-500 text-white text-[11px] px-2.5 py-1 rounded-lg font-bold">+ Postiços</button>
-                <button onclick="createCustomChecklist()" class="bg-slate-800 hover:bg-slate-700 border border-white/10 text-[11px] px-2.5 py-1 rounded-lg">+ Outro</button>
+                <button type="button" onclick="window.createTemplateChecklist('CAD')" class="bg-slate-800 hover:bg-slate-700 border border-white/10 text-[11px] px-2.5 py-1 rounded-lg cursor-pointer">+ CAD</button>
+                <button type="button" onclick="window.createTemplateChecklist('CAM')" class="bg-slate-800 hover:bg-slate-700 border border-white/10 text-[11px] px-2.5 py-1 rounded-lg cursor-pointer">+ CAM</button>
+                <button type="button" onclick="window.createTemplateChecklist('CNC')" class="bg-purple-600 hover:bg-purple-500 text-white text-[11px] px-2.5 py-1 rounded-lg font-bold cursor-pointer">+ Grade CNC</button>
+                <button type="button" onclick="window.createTemplateChecklist('POSTIÇOS')" class="bg-sky-600 hover:bg-sky-500 text-white text-[11px] px-2.5 py-1 rounded-lg font-bold cursor-pointer">+ Postiços</button>
               </div>
             </div>
             <div id="checklistsContainer" class="space-y-4"></div>
           </div>
-
         </div>
 
-        <!-- COLUNA DIREITA: COMENTÁRIOS E HISTÓRICO -->
+        <!-- COLUNA DIREITA: COMENTÁRIOS E ATIVIDADE -->
         <div class="lg:col-span-5 p-6 bg-[#0d121c]/90 flex flex-col max-h-[82vh]">
           <div class="flex items-center justify-between mb-3">
             <h3 class="text-xs font-bold uppercase tracking-wider text-slate-300">💬 Comentários e atividade</h3>
-            <button onclick="toggleActivityDetails()" id="toggleDetailsBtn" class="text-[11px] text-slate-400 hover:text-white bg-white/5 px-2.5 py-1 rounded-lg">
+            <button type="button" onclick="window.toggleActivityDetails()" id="toggleDetailsBtn" class="text-[11px] text-slate-400 hover:text-white bg-white/5 px-2.5 py-1 rounded-lg cursor-pointer">
               Ocultar detalhes
             </button>
           </div>
           <div class="flex gap-2 mb-4">
             <input id="commentInput" type="text" placeholder="Escrever um comentário..." 
-              onkeydown="if(event.key==='Enter') addComment()"
+              onkeydown="if(event.key==='Enter') window.addComment()"
               class="flex-1 bg-slate-900 border border-white/10 rounded-xl px-3 py-2 text-xs text-white outline-none focus:border-cyan-400" />
-            <button onclick="addComment()" class="bg-cyan-500 hover:bg-cyan-400 text-slate-950 text-xs px-4 py-2 rounded-xl font-bold">Enviar</button>
+            <button type="button" onclick="window.addComment()" class="bg-cyan-500 hover:bg-cyan-400 text-slate-950 text-xs px-4 py-2 rounded-xl font-bold cursor-pointer">Enviar</button>
           </div>
           <div id="activitiesContainer" class="flex-1 overflow-y-auto space-y-3 pr-1 text-xs"></div>
         </div>
-
       </div>
     </div>
   </div>
 
   <script>
-    const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-    let columns = [];
-    let cards = [];
-    let checklists = [];
-    let checklistItems = [];
-    let currentCardId = null;
-    let currentBoard = localStorage.getItem('gravasul_board') || 'Gravasul | Prazos';
-    let activeMainView = 'board';
-    let selectedMemberFilter = '';
-    let showActivityDetails = true;
-    let hiddenCheckedMap = {}; // checklistId -> boolean
+    // =========================================================================
+    // 1. ESTADO GLOBAL BLINDADO (Inicializa na hora, nunca trava a tela)
+    // =========================================================================
+    var SUPABASE_URL = "https://aqjvvsisknicgeouvojm.supabase.co";
+    var SUPABASE_KEY = "sb_publishable_TLbL9Hk1HoFKwlwSUNDbyQ_fIsnPQwl";
+    var supabaseClient = null;
+
+    var DEFAULT_COLUMNS = [
+      { id: 'col-1', title: 'FILA DE PROJETOS', position: 1 },
+      { id: 'col-2', title: 'ESPECIFICAÇÃO', position: 2 },
+      { id: 'col-3', title: 'CAD', position: 3 },
+      { id: 'col-4', title: 'CAM', position: 4 },
+      { id: 'col-5', title: 'CNC', position: 5 },
+      { id: 'col-6', title: 'ACABAMENTO', position: 6 },
+      { id: 'col-7', title: 'FACAS', position: 7 },
+      { id: 'col-8', title: 'TEXTURIZAÇÃO QUÍMICA', position: 8 },
+      { id: 'col-9', title: 'FINALIZADO', position: 9 },
+      { id: 'col-10', title: 'ENTREGUE', position: 10 }
+    ];
+
+    var columns = DEFAULT_COLUMNS.slice();
+    var cards = [];
+    var checklists = [];
+    var checklistItems = [];
+    var currentCardId = null;
+    var currentBoard = localStorage.getItem('gravasul_board') || 'Gravasul | Prazos';
+    var activeMainView = 'board';
+    var selectedMemberFilter = '';
+    var showActivityDetails = true;
+    var hiddenCheckedMap = {};
+    var activeInlineComposerColId = null;
+
+    try {
+      if (window.supabase && typeof window.supabase.createClient === 'function') {
+        supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+      }
+    } catch (err) {
+      console.warn("Aviso ao iniciar cliente Supabase:", err);
+    }
 
     // =========================================================================
-    // MOVIMENTAÇÃO LATERAL CLICANDO NO FUNDO DO QUADRO (DRAG-TO-PAN)
+    // 2. MOVIMENTAÇÃO LATERAL CLICANDO NO FUNDO DO QUADRO (DRAG-TO-PAN)
     // =========================================================================
-    const boardEl = document.getElementById('boardContainer');
-    let isPanning = false;
-    let startX = 0;
-    let scrollLeftStart = 0;
+    var boardEl = document.getElementById('boardContainer');
+    var isPanning = false;
+    var startX = 0;
+    var scrollLeftStart = 0;
 
-    boardEl.addEventListener('mousedown', (e) => {
-      // Só arrasta o fundo se não clicou dentro de um cartão, botão, input ou select
-      if (e.target.closest('[data-card-id], button, input, select, textarea, a, label')) return;
+    boardEl.addEventListener('mousedown', function(e) {
+      if (e.target.closest('[data-card-id], button, input, select, textarea, a, label, .inline-composer')) return;
       isPanning = true;
       boardEl.classList.add('panning');
       startX = e.pageX - boardEl.offsetLeft;
       scrollLeftStart = boardEl.scrollLeft;
     });
-    window.addEventListener('mouseup', () => {
+    window.addEventListener('mouseup', function() {
       isPanning = false;
       boardEl.classList.remove('panning');
     });
-    boardEl.addEventListener('mousemove', (e) => {
+    boardEl.addEventListener('mousemove', function(e) {
       if (!isPanning) return;
       e.preventDefault();
-      const x = e.pageX - boardEl.offsetLeft;
-      const walk = (x - startX) * 1.6;
-      boardEl.scrollLeft = scrollLeftStart - walk;
+      var x = e.pageX - boardEl.offsetLeft;
+      boardEl.scrollLeft = scrollLeftStart - (x - startX) * 1.6;
     });
 
     // =========================================================================
-    // CARREGAMENTO DE DADOS DO SUPABASE
+    // 3. SINCRONIZAÇÃO COM SUPABASE (COM FALLBACK AUTOMÁTICO DE COLUNAS)
     // =========================================================================
-    async function loadAllData() {
+    window.loadAllData = async function() {
       document.getElementById('currentBoardLabel').innerText = currentBoard;
-      const [colRes, cardRes, chkRes, itemRes] = await Promise.all([
-        supabaseClient.from('kanban_columns').select('*').order('position'),
-        supabaseClient.from('kanban_cards').select('*').order('position'),
-        supabaseClient.from('card_checklists').select('*').order('position'),
-        supabaseClient.from('checklist_items').select('*').order('position')
-      ]);
-      columns = (colRes.data || []).filter(c => (c.board_name || 'Gravasul | Prazos') === currentBoard);
-      cards = (cardRes.data || []).filter(c => (c.board_name || 'Gravasul | Prazos') === currentBoard);
-      checklists = chkRes.data || [];
-      checklistItems = itemRes.data || [];
-
-      // Se criou um quadro novo sem colunas ainda, cria as colunas padrão
-      if (columns.length === 0 && (colRes.data || []).length > 0 && currentBoard !== 'Gravasul | Prazos') {
-        await seedColumnsForBoard(currentBoard);
-        return loadAllData();
+      if (!supabaseClient) {
+        renderMemberAvatars();
+        renderActiveView();
+        renderInboxAndPlanner();
+        return;
       }
 
-      document.getElementById('archivedCount').innerText = cards.filter(c => c.is_archived).length;
+      try {
+        var results = await Promise.all([
+          supabaseClient.from('kanban_columns').select('*').order('position'),
+          supabaseClient.from('kanban_cards').select('*').order('position'),
+          supabaseClient.from('card_checklists').select('*').order('position'),
+          supabaseClient.from('checklist_items').select('*').order('position')
+        ]);
+
+        var dbCols = results[0].data || [];
+        var dbCards = results[1].data || [];
+        checklists = results[2].data || [];
+        checklistItems = results[3].data || [];
+
+        if (dbCols.length > 0) {
+          var filteredCols = dbCols.filter(function(c) {
+            return !c.board_name || c.board_name === currentBoard;
+          });
+          columns = filteredCols.length > 0 ? filteredCols : dbCols;
+        }
+
+        cards = dbCards.filter(function(c) {
+          return !c.board_name || c.board_name === currentBoard;
+        });
+
+        document.getElementById('archivedCount').innerText = cards.filter(function(c) { return c.is_archived; }).length;
+      } catch (err) {
+        console.warn("Erro ao carregar dados:", err);
+      }
+
       renderMemberAvatars();
       renderActiveView();
       renderInboxAndPlanner();
-      if (currentCardId) openCardModal(currentCardId);
+      if (currentCardId) window.openCardModal(currentCardId);
+    };
+
+    // Função inteligente que salva no Supabase mesmo se o usuário não tiver criado colunas novas no SQL
+    async function safeInsert(table, payload) {
+      if (!supabaseClient) return null;
+      var res = await supabaseClient.from(table).insert(payload).select().single();
+      if (res.error && payload.board_name !== undefined) {
+        var cleanPayload = Object.assign({}, payload);
+        delete cleanPayload.board_name;
+        delete cleanPayload.attachments;
+        delete cleanPayload.is_archived;
+        delete cleanPayload.is_template;
+        res = await supabaseClient.from(table).insert(cleanPayload).select().single();
+      }
+      return res.data;
     }
 
-    async function seedColumnsForBoard(boardName) {
-      const defaultCols = ['FILA DE PROJETOS','ESPECIFICAÇÃO','CAD','CAM','CNC','ACABAMENTO','FACAS','TEXTURIZAÇÃO QUÍMICA','FINALIZADO','ENTREGUE'];
-      await supabaseClient.from('kanban_columns').insert(defaultCols.map((t, i) => ({ title: t, position: i + 1, board_name: boardName })));
+    async function safeUpdate(table, payload, id) {
+      if (!supabaseClient) return;
+      var res = await supabaseClient.from(table).update(payload).eq('id', id);
+      if (res.error) {
+        console.warn("Aviso no update:", res.error.message);
+      }
     }
 
     function getFilteredActiveCards() {
-      const search = document.getElementById('searchInput').value.toLowerCase();
-      const destFilter = document.getElementById('filterDestino').value;
-      return cards.filter(c => {
+      var search = (document.getElementById('searchInput').value || '').toLowerCase();
+      var destFilter = document.getElementById('filterDestino').value || '';
+      return cards.filter(function(c) {
         if (c.is_archived) return false;
-        const matchSearch = c.title.toLowerCase().includes(search) ||
+        var matchSearch = (c.title || '').toLowerCase().includes(search) ||
           (c.responsavel && c.responsavel.toLowerCase().includes(search)) ||
           (c.description && c.description.toLowerCase().includes(search));
-        const matchDest = !destFilter || c.destino === destFilter;
-        const matchMember = !selectedMemberFilter || (c.responsavel && c.responsavel.toUpperCase().includes(selectedMemberFilter));
+        var matchDest = !destFilter || c.destino === destFilter;
+        var matchMember = !selectedMemberFilter || (c.responsavel && c.responsavel.toUpperCase().includes(selectedMemberFilter));
         return matchSearch && matchDest && matchMember;
       });
     }
 
     // =========================================================================
-    // AVATARES DE EQUIPA NO TOPO (FILTRO 1 CLIQUE IGUAL AO VÍDEO 01:01)
+    // 4. AVATARES DE EQUIPE E VISTAS DO TRELLO PREMIUM
     // =========================================================================
     function renderMemberAvatars() {
-      const members = [
+      var members = [
         { initials: 'BM', name: 'BRUNO', color: 'bg-cyan-600' },
         { initials: 'JC', name: 'JACARÉ', color: 'bg-emerald-600' },
         { initials: 'DJ', name: 'DJOW', color: 'bg-purple-600' },
@@ -546,35 +591,29 @@
         { initials: 'IN', name: 'IGOR NUNES', color: 'bg-pink-600' },
         { initials: 'DG', name: 'DOUGLAS', color: 'bg-indigo-600' }
       ];
-      const container = document.getElementById('memberAvatars');
-      container.innerHTML = members.map(m => {
-        const active = selectedMemberFilter === m.name;
-        return `
-          <button onclick="toggleMemberFilter('${m.name}')" title="Filtrar por ${m.name}"
-            class="${m.color} ${active ? 'ring-2 ring-cyan-300 scale-110 z-10' : 'opacity-85 hover:opacity-100'} w-7 h-7 rounded-full text-[10px] font-extrabold text-white flex items-center justify-center border border-slate-950 transition">
-            ${m.initials}
-          </button>
-        `;
+      var container = document.getElementById('memberAvatars');
+      container.innerHTML = members.map(function(m) {
+        var active = selectedMemberFilter === m.name;
+        return '<button type="button" onclick="window.toggleMemberFilter(\'' + m.name + '\')" title="Filtrar por ' + m.name + '" ' +
+          'class="' + m.color + ' ' + (active ? 'ring-2 ring-cyan-300 scale-110 z-10' : 'opacity-85 hover:opacity-100') + ' w-7 h-7 rounded-full text-[10px] font-extrabold text-white flex items-center justify-center border border-slate-950 transition cursor-pointer">' +
+          m.initials + '</button>';
       }).join('');
     }
 
-    function toggleMemberFilter(name) {
+    window.toggleMemberFilter = function(name) {
       selectedMemberFilter = selectedMemberFilter === name ? '' : name;
       renderMemberAvatars();
-      renderActiveView();
-    }
+      window.renderActiveView();
+    };
 
-    // =========================================================================
-    // ALTERNADOR DE VISTAS DO TRELLO PREMIUM
-    // =========================================================================
-    function switchMainView(view) {
+    window.switchMainView = function(view) {
       activeMainView = view;
-      ['board', 'table', 'calendar', 'timeline', 'dashboard'].forEach(v => {
-        const btn = document.getElementById(`viewBtn_${v}`);
+      ['board', 'table', 'calendar', 'timeline', 'dashboard'].forEach(function(v) {
+        var btn = document.getElementById('viewBtn_' + v);
         if (btn) {
           btn.className = v === view 
-            ? 'px-3 py-1.5 rounded-lg bg-cyan-500 text-slate-950 font-bold transition'
-            : 'px-3 py-1.5 rounded-lg text-slate-300 hover:text-white transition';
+            ? 'px-3 py-1.5 rounded-lg bg-cyan-500 text-slate-950 font-bold transition cursor-pointer'
+            : 'px-3 py-1.5 rounded-lg text-slate-300 hover:text-white transition cursor-pointer';
         }
       });
       document.getElementById('boardContainer').classList.toggle('hidden', view !== 'board');
@@ -582,418 +621,406 @@
       document.getElementById('calendarViewContainer').classList.toggle('hidden', view !== 'calendar');
       document.getElementById('timelineViewContainer').classList.toggle('hidden', view !== 'timeline');
       document.getElementById('dashboardViewContainer').classList.toggle('hidden', view !== 'dashboard');
-      renderActiveView();
-    }
+      window.renderActiveView();
+    };
 
-    function renderActiveView() {
+    window.renderActiveView = function() {
       if (activeMainView === 'board') renderBoard();
       if (activeMainView === 'table') renderTableView();
       if (activeMainView === 'calendar') renderCalendarView();
       if (activeMainView === 'timeline') renderTimelineView();
       if (activeMainView === 'dashboard') renderDashboardView();
-    }
+    };
 
     // =========================================================================
-    // 1. VISTA QUADRO KANBAN
+    // 5. RENDERIZAÇÃO DO QUADRO KANBAN + COMPOSITOR DE CARTÃO INLINE
     // =========================================================================
     function renderBoard() {
-      const filteredCards = getFilteredActiveCards();
-      const board = document.getElementById('boardContainer');
+      var filteredCards = getFilteredActiveCards();
+      var board = document.getElementById('boardContainer');
       board.innerHTML = '';
 
-      columns.forEach(col => {
-        const colCards = filteredCards.filter(c => c.column_id === col.id);
-        const colEl = document.createElement('div');
+      columns.forEach(function(col) {
+        var colCards = filteredCards.filter(function(c) { return c.column_id === col.id; });
+        var isComposing = activeInlineComposerColId === col.id;
+
+        var colEl = document.createElement('div');
         colEl.className = 'glass-col w-[290px] shrink-0 rounded-2xl p-3 flex flex-col max-h-full border border-white/10 shadow-xl';
-        colEl.innerHTML = `
-          <div class="flex justify-between items-center px-1.5 py-1 mb-2.5">
-            <h2 class="font-extrabold text-xs text-slate-100 uppercase tracking-wider">${col.title}</h2>
-            <span class="bg-cyan-500/15 text-cyan-300 border border-cyan-500/30 text-[11px] px-2 py-0.5 rounded-full font-bold">${colCards.length}</span>
-          </div>
-          <div class="card-list flex-1 overflow-y-auto space-y-2.5 pr-1 min-h-[45px]" data-col-id="${col.id}">
-            ${colCards.map(card => renderCardFront(card)).join('')}
-          </div>
-          <button onclick="createNewCard('${col.id}')" class="mt-2.5 text-left text-xs text-slate-400 hover:text-cyan-300 hover:bg-white/5 px-2.5 py-2 rounded-xl font-medium transition">
-            + Adicionar um cartão
-          </button>
-        `;
+        colEl.innerHTML =
+          '<div class="flex justify-between items-center px-1.5 py-1 mb-2.5">' +
+            '<h2 class="font-extrabold text-xs text-slate-100 uppercase tracking-wider">' + col.title + '</h2>' +
+            '<span class="bg-cyan-500/15 text-cyan-300 border border-cyan-500/30 text-[11px] px-2 py-0.5 rounded-full font-bold">' + colCards.length + '</span>' +
+          '</div>' +
+          '<div class="card-list flex-1 overflow-y-auto space-y-2.5 pr-1 min-h-[45px]" data-col-id="' + col.id + '">' +
+            colCards.map(function(card) { return renderCardFront(card); }).join('') +
+          '</div>' +
+          (isComposing ? (
+            '<div class="inline-composer mt-2.5 bg-slate-900/95 p-2.5 rounded-xl border border-cyan-400/50 space-y-2">' +
+              '<textarea id="inlineCardTitle_' + col.id + '" rows="2" placeholder="Insira um título (Ex: FILA SPEEDLITE)..." ' +
+                'onkeydown="if(event.key===\'Enter\' && !event.shiftKey){event.preventDefault(); window.submitInlineCard(\'' + col.id + '\');}" ' +
+                'class="w-full bg-transparent text-xs text-white outline-none resize-none"></textarea>' +
+              '<div class="flex items-center gap-1.5">' +
+                '<button type="button" onclick="window.submitInlineCard(\'' + col.id + '\')" class="bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold text-xs px-3 py-1.5 rounded-lg cursor-pointer">Adicionar cartão</button>' +
+                '<button type="button" onclick="window.closeInlineComposer()" class="text-slate-400 hover:text-white text-sm px-2 cursor-pointer">✕</button>' +
+              '</div>' +
+            '</div>'
+          ) : (
+            '<button type="button" onclick="window.openInlineComposer(\'' + col.id + '\')" class="mt-2.5 text-left text-xs text-slate-400 hover:text-cyan-300 hover:bg-white/5 px-2.5 py-2 rounded-xl font-medium transition cursor-pointer">' +
+              '+ Adicionar um cartão' +
+            '</button>'
+          ));
+
         board.appendChild(colEl);
 
-        new Sortable(colEl.querySelector('.card-list'), {
-          group: 'kanban',
-          animation: 180,
-          onEnd: async (evt) => {
-            const cardId = evt.item.dataset.cardId;
-            const newColId = evt.to.dataset.colId;
-            const oldColId = evt.from.dataset.colId;
-            if (newColId !== oldColId) {
-              const oldCol = columns.find(c => c.id === oldColId)?.title || '';
-              const newCol = columns.find(c => c.id === newColId)?.title || '';
-              await supabaseClient.from('kanban_cards').update({ column_id: newColId, position: evt.newIndex }).eq('id', cardId);
-              await logActivity(cardId, `moveu este cartão de ${oldCol} para ${newCol}`);
-              loadAllData();
+        if (window.Sortable) {
+          new Sortable(colEl.querySelector('.card-list'), {
+            group: 'kanban',
+            animation: 180,
+            onEnd: async function(evt) {
+              var cardId = evt.item.dataset.cardId;
+              var newColId = evt.to.dataset.colId;
+              var oldColId = evt.from.dataset.colId;
+              if (newColId !== oldColId) {
+                var oldCol = (columns.find(function(c) { return c.id === oldColId; }) || {}).title || '';
+                var newCol = (columns.find(function(c) { return c.id === newColId; }) || {}).title || '';
+                await safeUpdate('kanban_cards', { column_id: newColId, position: evt.newIndex }, cardId);
+                await logActivity(cardId, 'moveu este cartão de ' + oldCol + ' para ' + newCol);
+                window.loadAllData();
+              }
             }
-          }
-        });
+          });
+        }
       });
+
+      if (activeInlineComposerColId) {
+        var inp = document.getElementById('inlineCardTitle_' + activeInlineComposerColId);
+        if (inp) inp.focus();
+      }
     }
+
+    window.openInlineComposer = function(colId) {
+      activeInlineComposerColId = colId;
+      renderBoard();
+    };
+
+    window.closeInlineComposer = function() {
+      activeInlineComposerColId = null;
+      renderBoard();
+    };
+
+    window.submitInlineCard = async function(colId) {
+      var inp = document.getElementById('inlineCardTitle_' + colId);
+      if (!inp || !inp.value.trim()) return;
+      var title = inp.value.trim();
+      activeInlineComposerColId = null;
+
+      var created = await safeInsert('kanban_cards', {
+        column_id: colId,
+        title: title,
+        position: cards.length + 1,
+        board_name: currentBoard
+      });
+
+      if (created) {
+        var colName = (columns.find(function(c) { return c.id === colId; }) || {}).title || '';
+        await logActivity(created.id, 'adicionou este cartão a ' + colName);
+      } else {
+        cards.push({ id: 'local-' + Date.now(), column_id: colId, title: title, position: cards.length + 1 });
+      }
+      window.loadAllData();
+    };
 
     function renderCardFront(card) {
-      const cardChks = checklists.filter(ch => ch.card_id === card.id).map(ch => ch.id);
-      const items = checklistItems.filter(i => cardChks.includes(i.checklist_id));
-      const doneItems = items.filter(i => i.is_checked).length;
-      const attachments = Array.isArray(card.attachments) ? card.attachments : [];
+      var cardChks = checklists.filter(function(ch) { return ch.card_id === card.id; }).map(function(ch) { return ch.id; });
+      var items = checklistItems.filter(function(i) { return cardChks.includes(i.checklist_id); });
+      var doneItems = items.filter(function(i) { return i.is_checked; }).length;
+      var attachments = Array.isArray(card.attachments) ? card.attachments : [];
 
-      const dueBadge = card.due_date ? `
-        <span class="${card.is_completed ? 'bg-emerald-600/90 text-white' : 'bg-amber-500/20 text-amber-300 border border-amber-400/30'} text-[10px] px-2 py-0.5 rounded-md flex items-center gap-1 font-semibold">
-          🕒 ${new Date(card.due_date).toLocaleDateString('pt-PT', {day:'2-digit', month:'short'})}
-        </span>` : '';
+      var dueBadge = card.due_date ? (
+        '<span class="' + (card.is_completed ? 'bg-emerald-600/90 text-white' : 'bg-amber-500/20 text-amber-300 border border-amber-400/30') + ' text-[10px] px-2 py-0.5 rounded-md flex items-center gap-1 font-semibold">' +
+          '🕒 ' + new Date(card.due_date).toLocaleDateString('pt-BR', {day:'2-digit', month:'short'}) +
+        '</span>'
+      ) : '';
 
-      const chkBadge = items.length > 0 ? `
-        <span class="${doneItems === items.length ? 'bg-emerald-600/90 text-white' : 'bg-white/10 text-slate-300'} text-[10px] px-2 py-0.5 rounded-md font-semibold">
-          ☑️ ${doneItems}/${items.length}
-        </span>` : '';
+      var chkBadge = items.length > 0 ? (
+        '<span class="' + (doneItems === items.length ? 'bg-emerald-600/90 text-white' : 'bg-white/10 text-slate-300') + ' text-[10px] px-2 py-0.5 rounded-md font-semibold">' +
+          '☑️ ' + doneItems + '/' + items.length +
+        '</span>'
+      ) : '';
 
-      const attachBadge = attachments.length > 0 ? `
-        <span class="bg-white/10 text-slate-300 text-[10px] px-1.5 py-0.5 rounded-md font-semibold">📎 ${attachments.length}</span>
-      ` : '';
+      var attachBadge = attachments.length > 0 ? (
+        '<span class="bg-white/10 text-slate-300 text-[10px] px-1.5 py-0.5 rounded-md font-semibold">📎 ' + attachments.length + '</span>'
+      ) : '';
 
-      return `
-        <div onclick="openCardModal('${card.id}')" data-card-id="${card.id}" 
-          class="glass-card rounded-xl overflow-hidden cursor-pointer border border-white/10 transition duration-200">
-          ${card.cover_image_url ? `<div class="bg-white p-1.5 flex justify-center"><img src="${card.cover_image_url}" class="h-32 object-contain" /></div>` : ''}
-          <div class="p-3 space-y-2">
-            ${card.is_template ? `<span class="inline-block bg-cyan-500/20 text-cyan-300 text-[9px] font-extrabold px-2 py-0.5 rounded">📋 CARTÃO TEMPLATE</span>` : ''}
-            <div class="text-xs font-bold text-white leading-snug">${card.title}</div>
-            
-            <div class="flex flex-wrap gap-1.5 items-center">
-              ${dueBadge}
-              ${chkBadge}
-              ${attachBadge}
-            </div>
-
-            <div class="flex flex-wrap gap-1 pt-1.5 border-t border-white/10 text-[10px] font-bold">
-              ${card.responsavel ? `<span class="bg-purple-600/90 text-white px-1.5 py-0.5 rounded"># RESPONSÁVEL: ${card.responsavel}</span>` : ''}
-              ${card.destino ? `<span class="bg-indigo-600/90 text-white px-1.5 py-0.5 rounded"># DESTINO: ${card.destino}</span>` : ''}
-              ${card.projeto ? `<span class="bg-emerald-600/90 text-white px-1.5 py-0.5 rounded"># PROJETO: ${card.projeto}</span>` : ''}
-              ${card.acabamento ? `<span class="bg-emerald-600/90 text-white px-1.5 py-0.5 rounded">ACABAMENTO: ${card.acabamento}</span>` : ''}
-              ${card.com_materiais ? `<span class="bg-emerald-600/90 text-white px-1.5 py-0.5 rounded">COM MATERIAIS: ${card.com_materiais}</span>` : ''}
-              ${card.equipe ? `<span class="bg-sky-600/90 text-white px-1.5 py-0.5 rounded">EQUIPE: ${card.equipe}</span>` : ''}
-              ${card.cadastro_cartao ? `<span class="bg-purple-900 text-purple-200 px-1.5 py-0.5 rounded">Cadastro/Cartão: ${card.cadastro_cartao}</span>` : ''}
-              ${card.especificacao ? `<span class="bg-teal-900/90 text-teal-200 px-1.5 py-0.5 rounded">☑ Especificação</span>` : ''}
-            </div>
-          </div>
-        </div>
-      `;
+      return (
+        '<div onclick="window.openCardModal(\'' + card.id + '\')" data-card-id="' + card.id + '" ' +
+          'class="glass-card rounded-xl overflow-hidden cursor-pointer border border-white/10 transition duration-200">' +
+          (card.cover_image_url ? '<div class="bg-white p-1.5 flex justify-center"><img src="' + card.cover_image_url + '" class="h-32 object-contain" /></div>' : '') +
+          '<div class="p-3 space-y-2">' +
+            (card.is_template ? '<span class="inline-block bg-cyan-500/20 text-cyan-300 text-[9px] font-extrabold px-2 py-0.5 rounded">📋 CARTÃO TEMPLATE</span>' : '') +
+            '<div class="text-xs font-bold text-white leading-snug">' + card.title + '</div>' +
+            '<div class="flex flex-wrap gap-1.5 items-center">' + dueBadge + chkBadge + attachBadge + '</div>' +
+            '<div class="flex flex-wrap gap-1 pt-1.5 border-t border-white/10 text-[10px] font-bold">' +
+              (card.responsavel ? '<span class="bg-purple-600/90 text-white px-1.5 py-0.5 rounded"># RESPONSÁVEL: ' + card.responsavel + '</span>' : '') +
+              (card.destino ? '<span class="bg-indigo-600/90 text-white px-1.5 py-0.5 rounded"># DESTINO: ' + card.destino + '</span>' : '') +
+              (card.projeto ? '<span class="bg-emerald-600/90 text-white px-1.5 py-0.5 rounded"># PROJETO: ' + card.projeto + '</span>' : '') +
+              (card.acabamento ? '<span class="bg-emerald-600/90 text-white px-1.5 py-0.5 rounded">ACABAMENTO: ' + card.acabamento + '</span>' : '') +
+              (card.com_materiais ? '<span class="bg-emerald-600/90 text-white px-1.5 py-0.5 rounded">COM MATERIAIS: ' + card.com_materiais + '</span>' : '') +
+              (card.equipe ? '<span class="bg-sky-600/90 text-white px-1.5 py-0.5 rounded">EQUIPE: ' + card.equipe + '</span>' : '') +
+              (card.cadastro_cartao ? '<span class="bg-purple-900 text-purple-200 px-1.5 py-0.5 rounded">Cadastro/Cartão: ' + card.cadastro_cartao + '</span>' : '') +
+              (card.especificacao ? '<span class="bg-teal-900/90 text-teal-200 px-1.5 py-0.5 rounded">☑ Especificação</span>' : '') +
+            '</div>' +
+          '</div>' +
+        '</div>'
+      );
     }
 
     // =========================================================================
-    // 2. VISTA TABELA (TRELLO PREMIUM)
+    // 6. VISTAS TABELA, CALENDÁRIO, CRONOGRAMA E PAINEL
     // =========================================================================
     function renderTableView() {
-      const list = getFilteredActiveCards();
-      const container = document.getElementById('tableViewContainer');
-      container.innerHTML = `
-        <div class="glass rounded-2xl border border-white/10 overflow-hidden shadow-2xl">
-          <table class="w-full text-left border-collapse text-xs">
-            <thead>
-              <tr class="bg-slate-900/90 text-slate-400 uppercase text-[10px] border-b border-white/10">
-                <th class="p-3.5">Matriz / Cartão</th>
-                <th class="p-3.5">Coluna</th>
-                <th class="p-3.5"># Responsável</th>
-                <th class="p-3.5"># Destino</th>
-                <th class="p-3.5">Equipe</th>
-                <th class="p-3.5">Projeto / Acab.</th>
-                <th class="p-3.5">Prazo</th>
-              </tr>
-            </thead>
-            <tbody class="divide-y divide-white/5">
-              ${list.map(c => {
-                const colName = columns.find(col => col.id === c.column_id)?.title || '-';
-                return `
-                  <tr onclick="openCardModal('${c.id}')" class="hover:bg-white/5 cursor-pointer transition">
-                    <td class="p-3.5 font-bold text-white flex items-center gap-2.5">
-                      ${c.cover_image_url ? `<img src="${c.cover_image_url}" class="w-9 h-7 object-contain bg-white rounded" />` : ''}
-                      ${c.title}
-                    </td>
-                    <td class="p-3.5"><span class="bg-white/10 px-2 py-1 rounded font-semibold">${colName}</span></td>
-                    <td class="p-3.5">${c.responsavel ? `<span class="bg-purple-600 text-white px-2 py-0.5 rounded font-bold">${c.responsavel}</span>` : '-'}</td>
-                    <td class="p-3.5">${c.destino ? `<span class="bg-indigo-600 text-white px-2 py-0.5 rounded font-bold">${c.destino}</span>` : '-'}</td>
-                    <td class="p-3.5">${c.equipe || '-'}</td>
-                    <td class="p-3.5">${c.projeto \vert{}\vert{} '-'} /${c.acabamento || '-'}</td>
-                    <td class="p-3.5">${c.due_date ? new Date(c.due_date).toLocaleDateString('pt-PT') : '-'}</td>
-                  </tr>
-                `;
-              }).join('')}
-            </tbody>
-          </table>
-        </div>
-      `;
+      var list = getFilteredActiveCards();
+      var container = document.getElementById('tableViewContainer');
+      container.innerHTML =
+        '<div class="glass rounded-2xl border border-white/10 overflow-hidden shadow-2xl">' +
+          '<table class="w-full text-left border-collapse text-xs">' +
+            '<thead><tr class="bg-slate-900/90 text-slate-400 uppercase text-[10px] border-b border-white/10">' +
+              '<th class="p-3.5">Matriz / Cartão</th><th class="p-3.5">Coluna</th><th class="p-3.5"># Responsável</th>' +
+              '<th class="p-3.5"># Destino</th><th class="p-3.5">Equipe</th><th class="p-3.5">Projeto / Acab.</th><th class="p-3.5">Prazo</th>' +
+            '</tr></thead>' +
+            '<tbody class="divide-y divide-white/5">' +
+              list.map(function(c) {
+                var colName = (columns.find(function(col) { return col.id === c.column_id; }) || {}).title || '-';
+                return '<tr onclick="window.openCardModal(\'' + c.id + '\')" class="hover:bg-white/5 cursor-pointer transition">' +
+                  '<td class="p-3.5 font-bold text-white">' + c.title + '</td>' +
+                  '<td class="p-3.5"><span class="bg-white/10 px-2 py-1 rounded font-semibold">' + colName + '</span></td>' +
+                  '<td class="p-3.5">' + (c.responsavel ? '<span class="bg-purple-600 text-white px-2 py-0.5 rounded font-bold">' + c.responsavel + '</span>' : '-') + '</td>' +
+                  '<td class="p-3.5">' + (c.destino || '-') + '</td>' +
+                  '<td class="p-3.5">' + (c.equipe || '-') + '</td>' +
+                  '<td class="p-3.5">' + (c.projeto || '-') + ' / ' + (c.acabamento || '-') + '</td>' +
+                  '<td class="p-3.5">' + (c.due_date ? new Date(c.due_date).toLocaleDateString('pt-BR') : '-') + '</td>' +
+                '</tr>';
+              }).join('') +
+            '</tbody></table></div>';
     }
 
-    // =========================================================================
-    // 3. VISTA CALENDÁRIO (TRELLO PREMIUM)
-    // =========================================================================
     function renderCalendarView() {
-      const list = getFilteredActiveCards().filter(c => c.due_date);
-      const container = document.getElementById('calendarViewContainer');
-      const grouped = {};
-      list.forEach(c => {
-        const dayKey = new Date(c.due_date).toLocaleDateString('pt-PT', { weekday: 'short', day: '2-digit', month: 'short' });
+      var list = getFilteredActiveCards().filter(function(c) { return c.due_date; });
+      var container = document.getElementById('calendarViewContainer');
+      var grouped = {};
+      list.forEach(function(c) {
+        var dayKey = new Date(c.due_date).toLocaleDateString('pt-BR', { weekday: 'short', day: '2-digit', month: 'short' });
         if (!grouped[dayKey]) grouped[dayKey] = [];
         grouped[dayKey].push(c);
       });
-      const keys = Object.keys(grouped);
-      container.innerHTML = `
-        <h2 class="text-base font-bold text-white mb-4">📅 Calendário de Entregas (${list.length} cartões com data)</h2>
-        <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4">
-          ${keys.length ? keys.map(day => `
-            <div class="glass p-4 rounded-2xl border border-white/10">
-              <div class="text-xs font-extrabold text-cyan-400 uppercase mb-3 border-b border-white/10 pb-1.5">${day}</div>
-              <div class="space-y-2">
-                ${grouped[day].map(c => `
-                  <div onclick="openCardModal('${c.id}')" class="bg-slate-800/80 hover:bg-slate-700 p-2.5 rounded-xl cursor-pointer border border-white/10 text-xs">
-                    <div class="font-bold text-white">${c.title}</div>
-                    <div class="text-[10px] text-purple-300 mt-1">${c.responsavel || 'Sem responsável'}</div>
-                  </div>
-                `).join('')}
-              </div>
-            </div>
-          `).join('') : `<p class="text-slate-400 text-xs">Define a "Data Entrega" nos cartões para os visualizar no calendário.</p>`}
-        </div>
-      `;
+      var keys = Object.keys(grouped);
+      container.innerHTML = '<h2 class="text-base font-bold text-white mb-4">📅 Calendário de Entregas (' + list.length + ')</h2>' +
+        '<div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4">' +
+        (keys.length ? keys.map(function(day) {
+          return '<div class="glass p-4 rounded-2xl border border-white/10">' +
+            '<div class="text-xs font-extrabold text-cyan-400 uppercase mb-3 border-b border-white/10 pb-1.5">' + day + '</div>' +
+            '<div class="space-y-2">' +
+              grouped[day].map(function(c) {
+                return '<div onclick="window.openCardModal(\'' + c.id + '\')" class="bg-slate-800/80 hover:bg-slate-700 p-2.5 rounded-xl cursor-pointer border border-white/10 text-xs">' +
+                  '<div class="font-bold text-white">' + c.title + '</div>' +
+                  '<div class="text-[10px] text-purple-300 mt-1">' + (c.responsavel || 'Sem responsável') + '</div>' +
+                '</div>';
+              }).join('') +
+            '</div></div>';
+        }).join('') : '<p class="text-slate-400 text-xs">Defina a "Data de Entrega" dentro dos cartões para visualizá-los no calendário.</p>') +
+        '</div>';
     }
 
-    // =========================================================================
-    // 4. VISTA CRONOGRAMA / TIMELINE POR RESPONSÁVEL
-    // =========================================================================
     function renderTimelineView() {
-      const list = getFilteredActiveCards();
-      const container = document.getElementById('timelineViewContainer');
-      const byResp = {};
-      list.forEach(c => {
-        const key = c.responsavel || 'SEM RESPONSÁVEL';
+      var list = getFilteredActiveCards();
+      var container = document.getElementById('timelineViewContainer');
+      var byResp = {};
+      list.forEach(function(c) {
+        var key = c.responsavel || 'SEM RESPONSÁVEL';
         if (!byResp[key]) byResp[key] = [];
         byResp[key].push(c);
       });
-      container.innerHTML = `
-        <h2 class="text-base font-bold text-white mb-4">⏳ Cronograma de Carga por Responsável</h2>
-        <div class="space-y-4">
-          ${Object.keys(byResp).map(resp => `
-            <div class="glass p-4 rounded-2xl border border-white/10">
-              <div class="flex items-center justify-between mb-3">
-                <span class="bg-purple-600 text-white text-xs font-extrabold px-3 py-1 rounded-lg"># ${resp}</span>
-                <span class="text-xs text-slate-400">${byResp[resp].length} matrizes ativas</span>
-              </div>
-              <div class="flex gap-3 overflow-x-auto pb-2">
-                ${byResp[resp].map(c => {
-                  const colName = columns.find(col => col.id === c.column_id)?.title || '';
-                  return `
-                    <div onclick="openCardModal('${c.id}')" class="w-64 shrink-0 bg-slate-900/90 hover:bg-slate-800 p-3 rounded-xl border border-white/10 cursor-pointer">
-                      <div class="text-[10px] text-cyan-400 font-bold mb-1">${colName}</div>
-                      <div class="text-xs font-bold text-white truncate">${c.title}</div>
-                      <div class="text-[10px] text-slate-400 mt-1">${c.due_date ? '🕒 ' + new Date(c.due_date).toLocaleDateString('pt-PT') : 'Sem prazo'}</div>
-                    </div>
-                  `;
-                }).join('')}
-              </div>
-            </div>
-          `).join('')}
-        </div>
-      `;
+      container.innerHTML = '<h2 class="text-base font-bold text-white mb-4">⏳ Cronograma por Responsável</h2><div class="space-y-4">' +
+        Object.keys(byResp).map(function(resp) {
+          return '<div class="glass p-4 rounded-2xl border border-white/10">' +
+            '<div class="flex items-center justify-between mb-3">' +
+              '<span class="bg-purple-600 text-white text-xs font-extrabold px-3 py-1 rounded-lg"># ' + resp + '</span>' +
+              '<span class="text-xs text-slate-400">' + byResp[resp].length + ' matrizes</span>' +
+            '</div>' +
+            '<div class="flex gap-3 overflow-x-auto pb-2">' +
+              byResp[resp].map(function(c) {
+                var colName = (columns.find(function(col) { return col.id === c.column_id; }) || {}).title || '';
+                return '<div onclick="window.openCardModal(\'' + c.id + '\')" class="w-64 shrink-0 bg-slate-900/90 hover:bg-slate-800 p-3 rounded-xl border border-white/10 cursor-pointer">' +
+                  '<div class="text-[10px] text-cyan-400 font-bold mb-1">' + colName + '</div>' +
+                  '<div class="text-xs font-bold text-white truncate">' + c.title + '</div>' +
+                '</div>';
+              }).join('') +
+            '</div></div>';
+        }).join('') + '</div>';
     }
 
-    // =========================================================================
-    // 5. VISTA PAINEL / DASHBOARD ANALÍTICO (TRELLO PREMIUM)
-    // =========================================================================
     function renderDashboardView() {
-      const list = getFilteredActiveCards();
-      const total = list.length;
-      const done = list.filter(c => c.is_completed).length;
-      const withSpec = list.filter(c => c.especificacao).length;
-      const container = document.getElementById('dashboardViewContainer');
+      var list = getFilteredActiveCards();
+      var total = list.length;
+      var done = list.filter(function(c) { return c.is_completed; }).length;
+      var withSpec = list.filter(function(c) { return c.especificacao; }).length;
+      var container = document.getElementById('dashboardViewContainer');
 
-      container.innerHTML = `
-        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
-          <div class="glass p-5 rounded-2xl border border-white/10">
-            <div class="text-xs text-slate-400">Total de Matrizes no Quadro</div>
-            <div class="text-3xl font-extrabold text-white mt-1">${total}</div>
-          </div>
-          <div class="glass p-5 rounded-2xl border border-white/10">
-            <div class="text-xs text-slate-400">Entregas Concluídas</div>
-            <div class="text-3xl font-extrabold text-emerald-400 mt-1">${done}</div>
-          </div>
-          <div class="glass p-5 rounded-2xl border border-white/10">
-            <div class="text-xs text-slate-400">Com Especificação Validada</div>
-            <div class="text-3xl font-extrabold text-cyan-400 mt-1">${withSpec}</div>
-          </div>
-        </div>
-        <div class="glass p-5 rounded-2xl border border-white/10">
-          <h3 class="text-sm font-bold text-white mb-4">📊 Matrizes por Etapa (Coluna)</h3>
-          <div class="space-y-3">
-            ${columns.map(col => {
-              const count = list.filter(c => c.column_id === col.id).length;
-              const pct = total ? Math.round((count / total) * 100) : 0;
-              return `
-                <div>
-                  <div class="flex justify-between text-xs mb-1">
-                    <span class="font-bold text-slate-200">${col.title}</span>
-                    <span class="text-cyan-300 font-bold">${count} (${pct}%)</span>
-                  </div>
-                  <div class="w-full bg-slate-800 h-2.5 rounded-full overflow-hidden">
-                    <div class="bg-gradient-to-r from-cyan-400 to-blue-500 h-2.5" style="width:${pct}%"></div>
-                  </div>
-                </div>
-              `;
-            }).join('')}
-          </div>
-        </div>
-      `;
+      container.innerHTML =
+        '<div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">' +
+          '<div class="glass p-5 rounded-2xl border border-white/10"><div class="text-xs text-slate-400">Total de Matrizes no Quadro</div><div class="text-3xl font-extrabold text-white mt-1">' + total + '</div></div>' +
+          '<div class="glass p-5 rounded-2xl border border-white/10"><div class="text-xs text-slate-400">Entregas Concluídas</div><div class="text-3xl font-extrabold text-emerald-400 mt-1">' + done + '</div></div>' +
+          '<div class="glass p-5 rounded-2xl border border-white/10"><div class="text-xs text-slate-400">Com Especificação Validada</div><div class="text-3xl font-extrabold text-cyan-400 mt-1">' + withSpec + '</div></div>' +
+        '</div>' +
+        '<div class="glass p-5 rounded-2xl border border-white/10"><h3 class="text-sm font-bold text-white mb-4">📊 Matrizes por Etapa</h3><div class="space-y-3">' +
+          columns.map(function(col) {
+            var count = list.filter(function(c) { return c.column_id === col.id; }).length;
+            var pct = total ? Math.round((count / total) * 100) : 0;
+            return '<div><div class="flex justify-between text-xs mb-1"><span class="font-bold text-slate-200">' + col.title + '</span><span class="text-cyan-300 font-bold">' + count + ' (' + pct + '%)</span></div>' +
+              '<div class="w-full bg-slate-800 h-2.5 rounded-full overflow-hidden"><div class="bg-gradient-to-r from-cyan-400 to-blue-500 h-2.5" style="width:' + pct + '%"></div></div></div>';
+          }).join('') +
+        '</div></div>';
     }
 
     // =========================================================================
-    // PAINÉIS DO DOCK INFERIOR: CAIXA DE ENTRADA E PLANEADOR (IGUAL AO VÍDEO)
+    // 7. PAINÉIS DO DOCK INFERIOR: CAIXA DE ENTRADA, PLANEADOR E MUDAR DE QUADRO
     // =========================================================================
-    function toggleDockPanel(panel) {
-      const inbox = document.getElementById('inboxPanel');
-      const planner = document.getElementById('plannerPanel');
+    window.toggleDockPanel = function(panel) {
+      var inbox = document.getElementById('inboxPanel');
+      var planner = document.getElementById('plannerPanel');
       if (panel === 'inbox') {
-        const isHidden = inbox.classList.contains('hidden');
+        var isHidden = inbox.classList.contains('hidden');
         inbox.classList.toggle('hidden', !isHidden);
         inbox.classList.toggle('flex', isHidden);
       }
       if (panel === 'planner') {
-        const isHidden = planner.classList.contains('hidden');
-        planner.classList.toggle('hidden', !isHidden);
-        planner.classList.toggle('flex', isHidden);
+        var isHiddenP = planner.classList.contains('hidden');
+        planner.classList.toggle('hidden', !isHiddenP);
+        planner.classList.toggle('flex', isHiddenP);
       }
       renderInboxAndPlanner();
-    }
+    };
 
     function renderInboxAndPlanner() {
-      // Caixa de entrada (guardada em localStorage + botão de enviar para a 1ª coluna)
-      const inboxItems = JSON.parse(localStorage.getItem('gravasul_inbox') || '[]');
-      const inboxList = document.getElementById('inboxList');
+      var inboxItems = JSON.parse(localStorage.getItem('gravasul_inbox') || '[]');
+      var inboxList = document.getElementById('inboxList');
       if (inboxList) {
-        inboxList.innerHTML = inboxItems.length ? inboxItems.map((item, idx) => `
-          <div class="bg-slate-900/90 border border-white/10 p-3 rounded-xl text-xs flex justify-between items-center gap-2">
-            <span class="font-semibold text-white">${item}</span>
-            <div class="flex gap-1">
-              <button onclick="promoteInboxToBoard(${idx})" title="Enviar para a 1ª coluna do Quadro" class="bg-cyan-500/20 text-cyan-300 px-2 py-1 rounded font-bold">➔ Quadro</button>
-              <button onclick="removeInboxItem(${idx})" class="text-slate-500 hover:text-red-400 px-1">✕</button>
-            </div>
-          </div>
-        `).join('') : `<div class="text-center text-slate-500 text-xs py-8">A tua Caixa de Entrada está vazia.</div>`;
+        inboxList.innerHTML = inboxItems.length ? inboxItems.map(function(item, idx) {
+          return '<div class="bg-slate-900/90 border border-white/10 p-3 rounded-xl text-xs flex justify-between items-center gap-2">' +
+            '<span class="font-semibold text-white">' + item + '</span>' +
+            '<div class="flex gap-1">' +
+              '<button type="button" onclick="window.promoteInboxToBoard(' + idx + ')" class="bg-cyan-500/20 text-cyan-300 px-2 py-1 rounded font-bold cursor-pointer">➔ Quadro</button>' +
+              '<button type="button" onclick="window.removeInboxItem(' + idx + ')" class="text-slate-500 hover:text-red-400 px-1 cursor-pointer">✕</button>' +
+            '</div></div>';
+        }).join('') : '<div class="text-center text-slate-500 text-xs py-8">Caixa de Entrada vazia.</div>';
       }
 
-      // Planeador diário (Agenda dos próximos dias)
-      const plannerList = document.getElementById('plannerList');
+      var plannerList = document.getElementById('plannerList');
       if (plannerList) {
-        const upcoming = getFilteredActiveCards().filter(c => c.due_date).sort((a,b) => new Date(a.due_date) - new Date(b.due_date));
-        plannerList.innerHTML = upcoming.length ? upcoming.map(c => `
-          <div onclick="openCardModal('${c.id}')" class="bg-slate-900/90 hover:bg-slate-800 border border-white/10 p-3 rounded-xl cursor-pointer">
-            <div class="text-[10px] font-bold text-cyan-400 uppercase">${new Date(c.due_date).toLocaleDateString('pt-PT', { weekday:'long', day:'2-digit', month:'long' })}</div>
-            <div class="text-xs font-bold text-white mt-1">${c.title}</div>
-            <div class="text-[10px] text-purple-300 mt-1">${c.responsavel || 'Sem responsável'}</div>
-          </div>
-        `).join('') : `<div class="text-slate-500 text-xs">Nenhuma entrega agendada. Define datas nos cartões para aparecerem aqui.</div>`;
+        var upcoming = getFilteredActiveCards().filter(function(c) { return c.due_date; }).sort(function(a,b) { return new Date(a.due_date) - new Date(b.due_date); });
+        plannerList.innerHTML = upcoming.length ? upcoming.map(function(c) {
+          return '<div onclick="window.openCardModal(\'' + c.id + '\')" class="bg-slate-900/90 hover:bg-slate-800 border border-white/10 p-3 rounded-xl cursor-pointer">' +
+            '<div class="text-[10px] font-bold text-cyan-400 uppercase">' + new Date(c.due_date).toLocaleDateString('pt-BR', { weekday:'long', day:'2-digit', month:'long' }) + '</div>' +
+            '<div class="text-xs font-bold text-white mt-1">' + c.title + '</div>' +
+            '<div class="text-[10px] text-purple-300 mt-1">' + (c.responsavel || 'Sem responsável') + '</div>' +
+          '</div>';
+        }).join('') : '<div class="text-slate-500 text-xs">Nenhuma entrega com data marcada.</div>';
       }
     }
 
-    function addInboxCard() {
-      const input = document.getElementById('inboxInput');
+    window.addInboxCard = function() {
+      var input = document.getElementById('inboxInput');
       if (!input.value.trim()) return;
-      const inboxItems = JSON.parse(localStorage.getItem('gravasul_inbox') || '[]');
+      var inboxItems = JSON.parse(localStorage.getItem('gravasul_inbox') || '[]');
       inboxItems.unshift(input.value.trim());
       localStorage.setItem('gravasul_inbox', JSON.stringify(inboxItems));
       input.value = '';
       renderInboxAndPlanner();
-    }
+    };
 
-    async function promoteInboxToBoard(idx) {
-      const inboxItems = JSON.parse(localStorage.getItem('gravasul_inbox') || '[]');
-      const title = inboxItems[idx];
+    window.promoteInboxToBoard = async function(idx) {
+      var inboxItems = JSON.parse(localStorage.getItem('gravasul_inbox') || '[]');
+      var title = inboxItems[idx];
       if (!title || !columns.length) return;
-      await supabaseClient.from('kanban_cards').insert({
-        column_id: columns[0].id, title, position: cards.length + 1, board_name: currentBoard
+      await safeInsert('kanban_cards', {
+        column_id: columns[0].id, title: title, position: cards.length + 1, board_name: currentBoard
       });
       inboxItems.splice(idx, 1);
       localStorage.setItem('gravasul_inbox', JSON.stringify(inboxItems));
-      loadAllData();
-    }
+      window.loadAllData();
+    };
 
-    function removeInboxItem(idx) {
-      const inboxItems = JSON.parse(localStorage.getItem('gravasul_inbox') || '[]');
+    window.removeInboxItem = function(idx) {
+      var inboxItems = JSON.parse(localStorage.getItem('gravasul_inbox') || '[]');
       inboxItems.splice(idx, 1);
       localStorage.setItem('gravasul_inbox', JSON.stringify(inboxItems));
       renderInboxAndPlanner();
-    }
+    };
 
-    // =========================================================================
-    // MUDAR DE QUADRO (BOARD SWITCHER IGUAL AO VÍDEO 00:09)
-    // =========================================================================
-    function toggleBoardSwitcher() {
-      const modal = document.getElementById('boardSwitcherModal');
-      const isHidden = modal.classList.contains('hidden');
+    window.toggleBoardSwitcher = function() {
+      var modal = document.getElementById('boardSwitcherModal');
+      var isHidden = modal.classList.contains('hidden');
       modal.classList.toggle('hidden', !isHidden);
       modal.classList.toggle('flex', isHidden);
       if (isHidden) renderBoardsList();
-    }
+    };
 
     function renderBoardsList() {
-      const savedBoards = JSON.parse(localStorage.getItem('gravasul_boards_list') || '["Gravasul | Prazos", "Gravasul - Freq"]');
-      document.getElementById('boardsList').innerHTML = savedBoards.map(b => `
-        <button onclick="selectBoard('${b}')" class="w-full flex items-center justify-between p-3 rounded-xl border ${b === currentBoard ? 'bg-cyan-500/20 border-cyan-400 text-white' : 'bg-slate-900/80 border-white/10 text-slate-300 hover:bg-white/5'} text-xs font-bold transition">
-          <span>📋 ${b}</span>
-          ${b === currentBoard ? '<span class="text-[10px] text-cyan-300">ATIVO</span>' : ''}
-        </button>
-      `).join('');
+      var savedBoards = JSON.parse(localStorage.getItem('gravasul_boards_list') || '["Gravasul | Prazos", "Gravasul - Freq"]');
+      document.getElementById('boardsList').innerHTML = savedBoards.map(function(b) {
+        return '<button type="button" onclick="window.selectBoard(\'' + b + '\')" class="w-full flex items-center justify-between p-3 rounded-xl border ' +
+          (b === currentBoard ? 'bg-cyan-500/20 border-cyan-400 text-white' : 'bg-slate-900/80 border-white/10 text-slate-300 hover:bg-white/5') + ' text-xs font-bold transition cursor-pointer">' +
+          '<span>📋 ' + b + '</span>' + (b === currentBoard ? '<span class="text-[10px] text-cyan-300">ATIVO</span>' : '') + '</button>';
+      }).join('');
     }
 
-    function selectBoard(boardName) {
+    window.selectBoard = function(boardName) {
       currentBoard = boardName;
       localStorage.setItem('gravasul_board', boardName);
-      toggleBoardSwitcher();
-      loadAllData();
-    }
+      window.toggleBoardSwitcher();
+      window.loadAllData();
+    };
 
-    function createNewBoard() {
-      const input = document.getElementById('newBoardName');
+    window.createNewBoard = function() {
+      var input = document.getElementById('newBoardName');
       if (!input.value.trim()) return;
-      const savedBoards = JSON.parse(localStorage.getItem('gravasul_boards_list') || '["Gravasul | Prazos", "Gravasul - Freq"]');
-      if (!savedBoards.includes(input.value.trim())) savedBoards.push(input.value.trim());
+      var savedBoards = JSON.parse(localStorage.getItem('gravasul_boards_list') || '["Gravasul | Prazos", "Gravasul - Freq"]');
+      var newB = input.value.trim();
+      if (!savedBoards.includes(newB)) savedBoards.push(newB);
       localStorage.setItem('gravasul_boards_list', JSON.stringify(savedBoards));
-      const newB = input.value.trim();
       input.value = '';
-      selectBoard(newB);
-    }
+      window.selectBoard(newB);
+    };
 
     // =========================================================================
-    // CRIAÇÃO E EDIÇÃO DE CARTÕES E MODAL COMPLETO
+    // 8. MODAL NOVA COLUNA E MODAL COMPLETO DO CARTÃO
     // =========================================================================
-    async function createNewCard(colId) {
-      const title = prompt("Nome do cartão (Ex: FILA HURRICANE - FREQ VISTA):");
-      if (!title) return;
-      const { data } = await supabaseClient.from('kanban_cards').insert({
-        column_id: colId, title, position: cards.length + 1, board_name: currentBoard
-      }).select().single();
-      if (data) {
-        const colName = columns.find(c => c.id === colId)?.title || '';
-        await logActivity(data.id, `adicionou este cartão a ${colName}`);
-        loadAllData();
-      }
-    }
+    window.openNewColumnModal = function() {
+      var modal = document.getElementById('newColumnModal');
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+      document.getElementById('newColumnInput').focus();
+    };
 
-    async function addNewColumn() {
-      const title = prompt("Nome da nova coluna:");
-      if (!title) return;
-      await supabaseClient.from('kanban_columns').insert({ title: title.toUpperCase(), position: columns.length + 1, board_name: currentBoard });
-      loadAllData();
-    }
+    window.closeNewColumnModal = function() {
+      var modal = document.getElementById('newColumnModal');
+      modal.classList.add('hidden');
+      modal.classList.remove('flex');
+    };
 
-    async function openCardModal(cardId) {
+    window.confirmAddNewColumn = async function() {
+      var inp = document.getElementById('newColumnInput');
+      if (!inp.value.trim()) return;
+      var title = inp.value.trim().toUpperCase();
+      inp.value = '';
+      window.closeNewColumnModal();
+      await safeInsert('kanban_columns', { title: title, position: columns.length + 1, board_name: currentBoard });
+      window.loadAllData();
+    };
+
+    window.openCardModal = function(cardId) {
       currentCardId = cardId;
-      const card = cards.find(c => c.id === cardId);
+      var card = cards.find(function(c) { return c.id === cardId; });
       if (!card) return;
 
       document.getElementById('cardModal').classList.remove('hidden');
@@ -1001,19 +1028,18 @@
       document.getElementById('cardActionsDropdown').classList.add('hidden');
       document.getElementById('copyCardPopover').classList.add('hidden');
 
-      // Banner de arquivado
-      const archBanner = document.getElementById('archivedBanner');
+      var archBanner = document.getElementById('archivedBanner');
       archBanner.classList.toggle('hidden', !card.is_archived);
       archBanner.classList.toggle('flex', !!card.is_archived);
 
-      // Badge de Template
       document.getElementById('templateBadge').classList.toggle('hidden', !card.is_template);
 
-      // Seletor de coluna no topo do modal
-      const colSelect = document.getElementById('modalColumnSelect');
-      colSelect.innerHTML = columns.map(col => `<option value="${col.id}" ${col.id === card.column_id ? 'selected' : ''}>${col.title}</option>`).join('');
+      var colSelect = document.getElementById('modalColumnSelect');
+      colSelect.innerHTML = columns.map(function(col) {
+        return '<option value="' + col.id + '" ' + (col.id === card.column_id ? 'selected' : '') + '>' + col.title + '</option>';
+      }).join('');
 
-      const coverBox = document.getElementById('modalCoverContainer');
+      var coverBox = document.getElementById('modalCoverContainer');
       if (card.cover_image_url) {
         coverBox.classList.remove('hidden');
         document.getElementById('modalCoverImg').src = card.cover_image_url;
@@ -1036,71 +1062,69 @@
       document.getElementById('field_cadastro_cartao').value = card.cadastro_cartao || '';
       document.getElementById('field_especificacao').checked = !!card.especificacao;
 
-      document.getElementById('syncDataPreview').innerHTML = `
-        Responsável: ${card.responsavel || 'NÃO INFORMADO'}<br/>
-        Destino: ${card.destino || 'NÃO INFORMADO'}<br/>
-        Equipe: ${card.equipe || 'NÃO INFORMADO'}
-      `;
+      document.getElementById('syncDataPreview').innerHTML =
+        'Responsável: ' + (card.responsavel || 'NÃO INFORMADO') + '<br/>' +
+        'Destino: ' + (card.destino || 'NÃO INFORMADO') + '<br/>' +
+        'Equipe: ' + (card.equipe || 'NÃO INFORMADO');
 
       renderModalAttachments(card);
       renderModalChecklists(cardId);
       loadCardActivities(cardId);
-    }
+    };
 
-    function closeModal() {
+    window.closeModal = function() {
       currentCardId = null;
       document.getElementById('cardModal').classList.add('hidden');
       document.getElementById('cardModal').classList.remove('flex');
-    }
+    };
 
-    async function saveCardField(field, value) {
+    window.saveCardField = async function(field, value) {
       if (!currentCardId) return;
-      await supabaseClient.from('kanban_cards').update({ [field]: value === '' ? null : value }).eq('id', currentCardId);
-      await logActivity(currentCardId, `atualizou ${field}`);
-      loadAllData();
-    }
+      await safeUpdate('kanban_cards', { [field]: value === '' ? null : value }, currentCardId);
+      await logActivity(currentCardId, 'atualizou ' + field);
+      window.loadAllData();
+    };
 
-    async function moveCurrentCardToColumn(newColId) {
+    window.moveCurrentCardToColumn = async function(newColId) {
       if (!currentCardId) return;
-      const card = cards.find(c => c.id === currentCardId);
-      const oldCol = columns.find(c => c.id === card?.column_id)?.title || '';
-      const newCol = columns.find(c => c.id === newColId)?.title || '';
-      await supabaseClient.from('kanban_cards').update({ column_id: newColId }).eq('id', currentCardId);
-      await logActivity(currentCardId, `moveu este cartão de ${oldCol} para ${newCol}`);
-      loadAllData();
-    }
+      var card = cards.find(function(c) { return c.id === currentCardId; });
+      var oldCol = (columns.find(function(c) { return c.id === (card && card.column_id); }) || {}).title || '';
+      var newCol = (columns.find(function(c) { return c.id === newColId; }) || {}).title || '';
+      await safeUpdate('kanban_cards', { column_id: newColId }, currentCardId);
+      await logActivity(currentCardId, 'moveu este cartão de ' + oldCol + ' para ' + newCol);
+      window.loadAllData();
+    };
 
-    // =========================================================================
-    // AÇÕES DO MENU ••• (COPIAR CARTÃO, ARQUIVAR, TEMPLATE, INGRESSAR)
-    // =========================================================================
-    function toggleCardActionsMenu() {
+    window.toggleCardActionsMenu = function() {
       document.getElementById('cardActionsDropdown').classList.toggle('hidden');
-    }
+    };
 
-    async function joinCard() {
-      const user = document.getElementById('currentUser').value.toUpperCase();
-      await saveCardField('responsavel', user);
+    window.joinCard = async function() {
+      var user = document.getElementById('currentUser').value.toUpperCase();
+      await window.saveCardField('responsavel', user);
       document.getElementById('cardActionsDropdown').classList.add('hidden');
-    }
+    };
 
-    function openCopyCardPane() {
+    window.openCopyCardPane = function() {
       document.getElementById('cardActionsDropdown').classList.add('hidden');
-      const card = cards.find(c => c.id === currentCardId);
+      var card = cards.find(function(c) { return c.id === currentCardId; });
       if (!card) return;
       document.getElementById('copyCardTitle').value = card.title;
-      document.getElementById('copyCardTargetCol').innerHTML = columns.map(col => `<option value="${col.id}" ${col.id === card.column_id ? 'selected' : ''}>${col.title}</option>`).join('');
+      document.getElementById('copyCardTargetCol').innerHTML = columns.map(function(col) {
+        return '<option value="' + col.id + '" ' + (col.id === card.column_id ? 'selected' : '') + '>' + col.title + '</option>';
+      }).join('');
       document.getElementById('copyCardPopover').classList.remove('hidden');
-    }
+    };
 
-    async function confirmCopyCard() {
-      const card = cards.find(c => c.id === currentCardId);
+    window.confirmCopyCard = async function() {
+      var card = cards.find(function(c) { return c.id === currentCardId; });
       if (!card) return;
-      const newTitle = document.getElementById('copyCardTitle').value.trim() || card.title;
-      const targetColId = document.getElementById('copyCardTargetCol').value;
-      const keepChk = document.getElementById('copyKeepChecklists').checked;
-      const keepAtt = document.getElementById('copyKeepAttachments').checked;
+      var newTitle = document.getElementById('copyCardTitle').value.trim() || card.title;
+      var targetColId = document.getElementById('copyCardTargetCol').value;
+      var keepChk = document.getElementById('copyKeepChecklists').checked;
+      var keepAtt = document.getElementById('copyKeepAttachments').checked;
 
-      const { data: newCard } = await supabaseClient.from('kanban_cards').insert({
+      var newCard = await safeInsert('kanban_cards', {
         column_id: targetColId,
         title: newTitle,
         description: card.description,
@@ -1118,308 +1142,268 @@
         cadastro_cartao: card.cadastro_cartao,
         especificacao: card.especificacao,
         board_name: currentBoard
-      }).select().single();
+      });
 
       if (newCard && keepChk) {
-        const origChks = checklists.filter(ch => ch.card_id === card.id);
-        for (const ch of origChks) {
-          const { data: createdChk } = await supabaseClient.from('card_checklists').insert({
-            card_id: newCard.id, title: ch.title, position: ch.position
-          }).select().single();
-          const origItems = checklistItems.filter(i => i.checklist_id === ch.id);
+        var origChks = checklists.filter(function(ch) { return ch.card_id === card.id; });
+        for (var i = 0; i < origChks.length; i++) {
+          var ch = origChks[i];
+          var createdChk = await safeInsert('card_checklists', { card_id: newCard.id, title: ch.title, position: ch.position });
+          var origItems = checklistItems.filter(function(it) { return it.checklist_id === ch.id; });
           if (createdChk && origItems.length) {
             await supabaseClient.from('checklist_items').insert(
-              origItems.map(i => ({ checklist_id: createdChk.id, content: i.content, is_checked: false, position: i.position }))
+              origItems.map(function(it) { return { checklist_id: createdChk.id, content: it.content, is_checked: false, position: it.position }; })
             );
           }
         }
       }
 
       document.getElementById('copyCardPopover').classList.add('hidden');
-      await logActivity(newCard.id, `copiou este cartão de ${card.title}`);
-      await loadAllData();
-      openCardModal(newCard.id);
-    }
+      if (newCard) {
+        await logActivity(newCard.id, 'copiou este cartão de ' + card.title);
+        await window.loadAllData();
+        window.openCardModal(newCard.id);
+      }
+    };
 
-    async function toggleTemplateCurrentCard() {
-      const card = cards.find(c => c.id === currentCardId);
+    window.toggleTemplateCurrentCard = async function() {
+      var card = cards.find(function(c) { return c.id === currentCardId; });
       if (!card) return;
-      await saveCardField('is_template', !card.is_template);
+      await window.saveCardField('is_template', !card.is_template);
       document.getElementById('cardActionsDropdown').classList.add('hidden');
-    }
+    };
 
-    async function toggleArchiveCurrentCard(archiveState) {
+    window.toggleArchiveCurrentCard = async function(archiveState) {
       if (!currentCardId) return;
-      await supabaseClient.from('kanban_cards').update({ is_archived: archiveState }).eq('id', currentCardId);
-      await logActivity(currentCardId, archiveState ? 'arquivou este cartão' : 'enviou este cartão de volta ao quadro');
+      await safeUpdate('kanban_cards', { is_archived: archiveState }, currentCardId);
+      await logActivity(currentCardId, archiveState ? 'arquivou este cartão' : 'restaurou este cartão ao quadro');
       document.getElementById('cardActionsDropdown').classList.add('hidden');
-      loadAllData();
-    }
+      window.loadAllData();
+    };
 
-    function openArchivedModal() {
-      const modal = document.getElementById('archivedModal');
+    window.openArchivedModal = function() {
+      var modal = document.getElementById('archivedModal');
       modal.classList.remove('hidden');
       modal.classList.add('flex');
-      const arch = cards.filter(c => c.is_archived);
-      document.getElementById('archivedCardsList').innerHTML = arch.length ? arch.map(c => `
-        <div class="bg-slate-900 border border-white/10 p-3 rounded-xl flex justify-between items-center text-xs">
-          <div>
-            <div class="font-bold text-white">${c.title}</div>
-            <div class="text-[10px] text-slate-400">${c.responsavel || ''}</div>
-          </div>
-          <div class="flex gap-2">
-            <button onclick="restoreCard('${c.id}')" class="bg-cyan-500 text-slate-950 font-bold px-3 py-1 rounded-lg">Restaurar</button>
-            <button onclick="openCardModal('${c.id}'); closeArchivedModal();" class="bg-white/10 text-white px-3 py-1 rounded-lg">Abrir</button>
-          </div>
-        </div>
-      `).join('') : `<div class="text-slate-500 text-xs text-center py-6">Nenhum cartão arquivado.</div>`;
-    }
+      var arch = cards.filter(function(c) { return c.is_archived; });
+      document.getElementById('archivedCardsList').innerHTML = arch.length ? arch.map(function(c) {
+        return '<div class="bg-slate-900 border border-white/10 p-3 rounded-xl flex justify-between items-center text-xs">' +
+          '<div><div class="font-bold text-white">' + c.title + '</div><div class="text-[10px] text-slate-400">' + (c.responsavel || '') + '</div></div>' +
+          '<div class="flex gap-2">' +
+            '<button type="button" onclick="window.restoreCard(\'' + c.id + '\')" class="bg-cyan-500 text-slate-950 font-bold px-3 py-1 rounded-lg cursor-pointer">Restaurar</button>' +
+            '<button type="button" onclick="window.openCardModal(\'' + c.id + '\'); window.closeArchivedModal();" class="bg-white/10 text-white px-3 py-1 rounded-lg cursor-pointer">Abrir</button>' +
+          '</div></div>';
+      }).join('') : '<div class="text-slate-500 text-xs text-center py-6">Nenhum cartão arquivado.</div>';
+    };
 
-    function closeArchivedModal() {
+    window.closeArchivedModal = function() {
       document.getElementById('archivedModal').classList.add('hidden');
       document.getElementById('archivedModal').classList.remove('flex');
-    }
+    };
 
-    async function restoreCard(id) {
-      await supabaseClient.from('kanban_cards').update({ is_archived: false }).eq('id', id);
-      openArchivedModal();
-      loadAllData();
-    }
+    window.restoreCard = async function(id) {
+      await safeUpdate('kanban_cards', { is_archived: false }, id);
+      window.openArchivedModal();
+      window.loadAllData();
+    };
 
     // =========================================================================
-    // GALERIA DE ANEXOS E CAPA 3D
+    // 9. UPLOAD DE CAPA 3D / ANEXOS E CHECKLISTS
     // =========================================================================
-    async function uploadAttachment(event, setAsCover = true) {
-      const file = event.target.files[0];
+    window.uploadAttachment = async function(event, setAsCover) {
+      var file = event.target.files[0];
       if (!file || !currentCardId) return;
-      const card = cards.find(c => c.id === currentCardId);
-      const fileName = `${currentCardId}_${Date.now()}_${file.name}`;
-      const { error } = await supabaseClient.storage.from('anexos').upload(fileName, file);
-      if (error) return alert("Erro no upload: " + error.message);
-      const { data } = supabaseClient.storage.from('anexos').getPublicUrl(fileName);
+      var card = cards.find(function(c) { return c.id === currentCardId; });
+      var fileName = currentCardId + '_' + Date.now() + '_' + file.name;
+      var publicUrl = null;
 
-      const currentAtt = Array.isArray(card.attachments) ? [...card.attachments] : [];
-      currentAtt.push({ name: file.name, url: data.publicUrl, created_at: new Date().toISOString() });
+      try {
+        var upRes = await supabaseClient.storage.from('anexos').upload(fileName, file);
+        if (!upRes.error) {
+          publicUrl = supabaseClient.storage.from('anexos').getPublicUrl(fileName).data.publicUrl;
+        }
+      } catch (e) {}
 
-      const updatePayload = { attachments: currentAtt };
-      if (setAsCover || !card.cover_image_url) updatePayload.cover_image_url = data.publicUrl;
+      // Fallback automático em Base64 se o bucket ainda não estiver liberado
+      if (!publicUrl) {
+        publicUrl = await new Promise(function(resolve) {
+          var reader = new FileReader();
+          reader.onload = function(e) { resolve(e.target.result); };
+          reader.readAsDataURL(file);
+        });
+      }
 
-      await supabaseClient.from('kanban_cards').update(updatePayload).eq('id', currentCardId);
-      await logActivity(currentCardId, `anexou ${file.name}`);
-      loadAllData();
-    }
+      var currentAtt = Array.isArray(card.attachments) ? card.attachments.slice() : [];
+      currentAtt.push({ name: file.name, url: publicUrl, created_at: new Date().toISOString() });
+
+      if (setAsCover || !card.cover_image_url) {
+        await safeUpdate('kanban_cards', { cover_image_url: publicUrl }, currentCardId);
+      }
+      await safeUpdate('kanban_cards', { attachments: currentAtt }, currentCardId);
+      await logActivity(currentCardId, 'anexou ' + file.name);
+      window.loadAllData();
+    };
 
     function renderModalAttachments(card) {
-      const list = Array.isArray(card.attachments) ? card.attachments : [];
+      var list = Array.isArray(card.attachments) ? card.attachments : [];
       document.getElementById('attachmentsCount').innerText = list.length;
-      const container = document.getElementById('attachmentsContainer');
-      container.innerHTML = list.map((att, idx) => `
-        <div class="bg-slate-900/80 border border-white/10 p-2.5 rounded-xl flex items-center justify-between gap-3 text-xs">
-          <div class="flex items-center gap-3 overflow-hidden">
-            <img src="${att.url}" class="w-14 h-10 object-contain bg-white rounded shrink-0" />
-            <div class="truncate">
-              <a href="${att.url}" target="_blank" class="font-bold text-white hover:underline truncate block">${att.name}</a>
-              <span class="text-[10px] text-slate-400">${att.created_at ? new Date(att.created_at).toLocaleString('pt-PT') : ''}</span>
-            </div>
-          </div>
-          <div class="flex items-center gap-1.5 shrink-0">
-            <button onclick="saveCardField('cover_image_url', '${att.url}')" class="bg-white/5 hover:bg-white/15 px-2.5 py-1 rounded text-[11px]">🖼️ Definir capa</button>
-            <button onclick="removeAttachment(${idx})" class="text-red-400 hover:bg-red-500/20 px-2 py-1 rounded">✕</button>
-          </div>
-        </div>
-      `).join('');
-    }
-
-    async function removeAttachment(idx) {
-      const card = cards.find(c => c.id === currentCardId);
-      if (!card) return;
-      const currentAtt = Array.isArray(card.attachments) ? [...card.attachments] : [];
-      currentAtt.splice(idx, 1);
-      await saveCardField('attachments', currentAtt);
-    }
-
-    // =========================================================================
-    // CHECKLISTS + COPIAR DE OUTRO CARTÃO + OCULTAR CONCLUÍDOS
-    // =========================================================================
-    function renderModalChecklists(cardId) {
-      const container = document.getElementById('checklistsContainer');
-      const cardChks = checklists.filter(c => c.card_id === cardId);
-      container.innerHTML = cardChks.map(chk => {
-        const items = checklistItems.filter(i => i.checklist_id === chk.id);
-        const doneCount = items.filter(i => i.is_checked).length;
-        const pct = items.length ? Math.round((doneCount / items.length) * 100) : 0;
-        const hideChecked = !!hiddenCheckedMap[chk.id];
-        const visibleItems = hideChecked ? items.filter(i => !i.is_checked) : items;
-
-        return `
-          <div class="bg-slate-900/80 p-4 rounded-2xl border border-white/10">
-            <div class="flex justify-between items-center mb-2">
-              <span class="font-extrabold text-xs text-white">☑️ ${chk.title} (${doneCount}/${items.length} — ${pct}%)</span>
-              <div class="flex items-center gap-2">
-                ${doneCount > 0 ? `
-                  <button onclick="toggleHideChecked('${chk.id}')" class="text-[11px] bg-white/5 hover:bg-white/10 px-2.5 py-1 rounded-lg text-slate-300">
-                    ${hideChecked ? `Mostrar concluídos (${doneCount})` : 'Ocultar itens concluídos'}
-                  </button>` : ''}
-                <button onclick="deleteChecklist('${chk.id}')" class="text-[11px] text-red-400 hover:underline">Excluir</button>
-              </div>
-            </div>
-            <div class="w-full bg-slate-800 h-2 rounded-full mb-3 overflow-hidden">
-              <div class="bg-gradient-to-r from-emerald-500 to-cyan-400 h-2 transition-all" style="width:${pct}%"></div>
-            </div>
-            <div class="space-y-1.5 mb-3">
-              ${visibleItems.map(item => `
-                <label class="flex items-center justify-between gap-2 text-xs cursor-pointer hover:bg-white/5 p-1.5 rounded-lg">
-                  <div class="flex items-center gap-2.5">
-                    <input type="checkbox" ${item.is_checked ? 'checked' : ''} onchange="toggleChecklistItem('${item.id}', '${item.content}', this.checked)" class="w-4 h-4 accent-emerald-500" />
-                    <span class="${item.is_checked ? 'line-through text-slate-500' : 'text-slate-200 font-medium'}">${item.content}</span>
-                  </div>
-                  ${item.completed_by ? `<span class="text-[10px] text-slate-500">${item.completed_by}</span>` : ''}
-                </label>
-              `).join('')}
-            </div>
-            <div class="flex gap-2">
-              <input id="newItem_${chk.id}" type="text" placeholder="Adicionar um item..." 
-                onkeydown="if(event.key==='Enter') addChecklistItem('${chk.id}')"
-                class="flex-1 bg-slate-950 border border-white/10 rounded-xl px-3 py-1.5 text-xs text-white outline-none" />
-              <button onclick="addChecklistItem('${chk.id}')" class="bg-white/10 hover:bg-white/20 text-xs px-3 py-1.5 rounded-xl font-semibold">Adicionar</button>
-            </div>
-          </div>
-        `;
+      var container = document.getElementById('attachmentsContainer');
+      container.innerHTML = list.map(function(att, idx) {
+        return '<div class="bg-slate-900/80 border border-white/10 p-2.5 rounded-xl flex items-center justify-between gap-3 text-xs">' +
+          '<div class="flex items-center gap-3 overflow-hidden">' +
+            '<img src="' + att.url + '" class="w-14 h-10 object-contain bg-white rounded shrink-0" />' +
+            '<div class="truncate"><a href="' + att.url + '" target="_blank" class="font-bold text-white hover:underline truncate block">' + att.name + '</a></div>' +
+          '</div>' +
+          '<div class="flex items-center gap-1.5 shrink-0">' +
+            '<button type="button" onclick="window.saveCardField(\'cover_image_url\', \'' + att.url + '\')" class="bg-white/5 hover:bg-white/15 px-2.5 py-1 rounded text-[11px] cursor-pointer">🖼️ Capa</button>' +
+            '<button type="button" onclick="window.removeAttachment(' + idx + ')" class="text-red-400 hover:bg-red-500/20 px-2 py-1 rounded cursor-pointer">✕</button>' +
+          '</div></div>';
       }).join('');
     }
 
-    function toggleHideChecked(chkId) {
+    window.removeAttachment = async function(idx) {
+      var card = cards.find(function(c) { return c.id === currentCardId; });
+      if (!card) return;
+      var currentAtt = Array.isArray(card.attachments) ? card.attachments.slice() : [];
+      currentAtt.splice(idx, 1);
+      await window.saveCardField('attachments', currentAtt);
+    };
+
+    function renderModalChecklists(cardId) {
+      var container = document.getElementById('checklistsContainer');
+      var cardChks = checklists.filter(function(c) { return c.card_id === cardId; });
+      container.innerHTML = cardChks.map(function(chk) {
+        var items = checklistItems.filter(function(i) { return i.checklist_id === chk.id; });
+        var doneCount = items.filter(function(i) { return i.is_checked; }).length;
+        var pct = items.length ? Math.round((doneCount / items.length) * 100) : 0;
+        var hideChecked = !!hiddenCheckedMap[chk.id];
+        var visibleItems = hideChecked ? items.filter(function(i) { return !i.is_checked; }) : items;
+
+        return '<div class="bg-slate-900/80 p-4 rounded-2xl border border-white/10">' +
+          '<div class="flex justify-between items-center mb-2">' +
+            '<span class="font-extrabold text-xs text-white">☑️ ' + chk.title + ' (' + doneCount + '/' + items.length + ' — ' + pct + '%)</span>' +
+            '<div class="flex items-center gap-2">' +
+              (doneCount > 0 ? '<button type="button" onclick="window.toggleHideChecked(\'' + chk.id + '\')" class="text-[11px] bg-white/5 hover:bg-white/10 px-2.5 py-1 rounded-lg text-slate-300 cursor-pointer">' + (hideChecked ? 'Mostrar concluídos (' + doneCount + ')' : 'Ocultar concluídos') + '</button>' : '') +
+              '<button type="button" onclick="window.deleteChecklist(\'' + chk.id + '\')" class="text-[11px] text-red-400 hover:underline cursor-pointer">Excluir</button>' +
+            '</div>' +
+          '</div>' +
+          '<div class="w-full bg-slate-800 h-2 rounded-full mb-3 overflow-hidden"><div class="bg-gradient-to-r from-emerald-500 to-cyan-400 h-2 transition-all" style="width:' + pct + '%"></div></div>' +
+          '<div class="space-y-1.5 mb-3">' +
+            visibleItems.map(function(item) {
+              return '<label class="flex items-center justify-between gap-2 text-xs cursor-pointer hover:bg-white/5 p-1.5 rounded-lg">' +
+                '<div class="flex items-center gap-2.5">' +
+                  '<input type="checkbox" ' + (item.is_checked ? 'checked' : '') + ' onchange="window.toggleChecklistItem(\'' + item.id + '\', \'' + item.content + '\', this.checked)" class="w-4 h-4 accent-emerald-500" />' +
+                  '<span class="' + (item.is_checked ? 'line-through text-slate-500' : 'text-slate-200 font-medium') + '">' + item.content + '</span>' +
+                '</div>' +
+                (item.completed_by ? '<span class="text-[10px] text-slate-500">' + item.completed_by + '</span>' : '') +
+              '</label>';
+            }).join('') +
+          '</div>' +
+          '<div class="flex gap-2">' +
+            '<input id="newItem_' + chk.id + '" type="text" placeholder="Adicionar um item..." onkeydown="if(event.key===\'Enter\') window.addChecklistItem(\'' + chk.id + '\')" class="flex-1 bg-slate-950 border border-white/10 rounded-xl px-3 py-1.5 text-xs text-white outline-none" />' +
+            '<button type="button" onclick="window.addChecklistItem(\'' + chk.id + '\')" class="bg-white/10 hover:bg-white/20 text-xs px-3 py-1.5 rounded-xl font-semibold cursor-pointer">Adicionar</button>' +
+          '</div></div>';
+      }).join('');
+    }
+
+    window.toggleHideChecked = function(chkId) {
       hiddenCheckedMap[chkId] = !hiddenCheckedMap[chkId];
       if (currentCardId) renderModalChecklists(currentCardId);
-    }
+    };
 
-    async function openCopyChecklistPrompt() {
-      const otherCards = cards.filter(c => c.id !== currentCardId);
-      const listNames = otherCards.slice(0, 15).map((c, idx) => `${idx + 1}. ${c.title}`).join('\n');
-      const choice = prompt(`Escolhe o número do cartão de onde queres copiar os Checklists:\n\n${listNames}`);
-      const index = parseInt(choice) - 1;
-      if (isNaN(index) || !otherCards[index]) return;
-      const sourceCard = otherCards[index];
-      const sourceChks = checklists.filter(ch => ch.card_id === sourceCard.id);
-      for (const ch of sourceChks) {
-        const { data: newChk } = await supabaseClient.from('card_checklists').insert({
-          card_id: currentCardId, title: ch.title
-        }).select().single();
-        const items = checklistItems.filter(i => i.checklist_id === ch.id);
-        if (newChk && items.length) {
-          await supabaseClient.from('checklist_items').insert(items.map((it, idx) => ({
-            checklist_id: newChk.id, content: it.content, is_checked: false, position: idx
-          })));
-        }
-      }
-      await logActivity(currentCardId, `copiou checklists do cartão ${sourceCard.title}`);
-      loadAllData();
-    }
-
-    async function createTemplateChecklist(type) {
+    window.createTemplateChecklist = async function(type) {
       if (!currentCardId) return;
-      const { data: chk } = await supabaseClient.from('card_checklists').insert({
-        card_id: currentCardId, title: type
-      }).select().single();
+      var chk = await safeInsert('card_checklists', { card_id: currentCardId, title: type });
       if (chk) {
-        let items = [];
+        var items = [];
         if (type === 'CNC') items = ['24/25 DIR - INF001','24/25 ESQ - INF002','26/27 DIR - INF003','26/27 ESQ - INF004','28/29 DIR - INF005','28/29 ESQ - INF006','30/31 DIR - INF007','30/31 ESQ - INF008','32/33 DIR - INF009','32/33 ESQ - INF010'];
         if (type === 'POSTIÇOS') items = ['DADOS DE POSTIÇOS', 'EQUIPE DE POSTIÇOS', 'CONFERÊNCIA DE ENCAIXE'];
         if (type === 'CAD' || type === 'CAM') items = ['MODELAMENTO 3D', 'REVISÃO DE ESCALA', 'GERAÇÃO DE CAMINHOS'];
         if (items.length) {
-          await supabaseClient.from('checklist_items').insert(items.map((g, idx) => ({ checklist_id: chk.id, content: g, position: idx })));
+          await supabaseClient.from('checklist_items').insert(items.map(function(g, idx) { return { checklist_id: chk.id, content: g, position: idx }; }));
         }
       }
-      loadAllData();
-    }
+      window.loadAllData();
+    };
 
-    async function createCustomChecklist() {
-      const title = prompt("Nome do Checklist:");
-      if (!title || !currentCardId) return;
-      await supabaseClient.from('card_checklists').insert({ card_id: currentCardId, title: title.toUpperCase() });
-      loadAllData();
-    }
-
-    async function addChecklistItem(chkId) {
-      const input = document.getElementById(`newItem_${chkId}`);
+    window.addChecklistItem = async function(chkId) {
+      var input = document.getElementById('newItem_' + chkId);
       if (!input.value.trim()) return;
       await supabaseClient.from('checklist_items').insert({ checklist_id: chkId, content: input.value.trim() });
       input.value = '';
-      loadAllData();
-    }
+      window.loadAllData();
+    };
 
-    async function toggleChecklistItem(itemId, content, isChecked) {
-      const user = document.getElementById('currentUser').value;
-      await supabaseClient.from('checklist_items').update({ is_checked: isChecked, completed_by: isChecked ? user : null }).eq('id', itemId);
-      await logActivity(currentCardId, `${isChecked ? 'concluiu' : 'desmarcou'} ${content} neste cartão`);
-      loadAllData();
-    }
+    window.toggleChecklistItem = async function(itemId, content, isChecked) {
+      var user = document.getElementById('currentUser').value;
+      await safeUpdate('checklist_items', { is_checked: isChecked, completed_by: isChecked ? user : null }, itemId);
+      await logActivity(currentCardId, (isChecked ? 'concluiu ' : 'desmarcou ') + content + ' neste cartão');
+      window.loadAllData();
+    };
 
-    async function deleteChecklist(chkId) {
+    window.deleteChecklist = async function(chkId) {
       await supabaseClient.from('card_checklists').delete().eq('id', chkId);
-      loadAllData();
-    }
+      window.loadAllData();
+    };
 
-    async function deleteCurrentCard() {
-      if (!confirm("Tens a certeza de que desejas excluir permanentemente este cartão?")) return;
+    window.deleteCurrentCard = async function() {
+      if (!currentCardId) return;
       await supabaseClient.from('kanban_cards').delete().eq('id', currentCardId);
-      closeModal();
-      loadAllData();
-    }
+      window.closeModal();
+      window.loadAllData();
+    };
 
-    function copySyncData() {
-      const text = document.getElementById('syncDataPreview').innerText;
+    window.copySyncData = function() {
+      var text = document.getElementById('syncDataPreview').innerText;
       navigator.clipboard.writeText(text);
-      alert("Dados sincronizados copiados!");
-    }
+    };
 
-    function copyCardLink() {
-      navigator.clipboard.writeText(window.location.href);
-      alert("Link do quadro copiado!");
-    }
-
-    // =========================================================================
-    // HISTÓRICO DE ATIVIDADES E COMENTÁRIOS
-    // =========================================================================
-    function toggleActivityDetails() {
+    window.toggleActivityDetails = function() {
       showActivityDetails = !showActivityDetails;
       document.getElementById('toggleDetailsBtn').innerText = showActivityDetails ? 'Ocultar detalhes' : 'Mostrar detalhes';
       if (currentCardId) loadCardActivities(currentCardId);
-    }
+    };
 
-    async function logActivity(cardId, actionText, isComment = false) {
-      const user = document.getElementById('currentUser').value;
+    async function logActivity(cardId, actionText, isComment) {
+      if (!supabaseClient) return;
+      var user = document.getElementById('currentUser').value;
       await supabaseClient.from('card_activities').insert({
-        card_id: cardId, user_name: user, action_text: actionText, is_comment: isComment
+        card_id: cardId, user_name: user, action_text: actionText, is_comment: !!isComment
       });
     }
 
-    async function addComment() {
-      const input = document.getElementById('commentInput');
+    window.addComment = async function() {
+      var input = document.getElementById('commentInput');
       if (!input.value.trim() || !currentCardId) return;
       await logActivity(currentCardId, input.value.trim(), true);
       input.value = '';
       loadCardActivities(currentCardId);
-    }
+    };
 
     async function loadCardActivities(cardId) {
-      const { data } = await supabaseClient.from('card_activities').select('*').eq('card_id', cardId).order('created_at', { ascending: false });
-      const list = (data || []).filter(a => showActivityDetails || a.is_comment);
-      const container = document.getElementById('activitiesContainer');
-      container.innerHTML = list.map(act => `
-        <div class="border-b border-white/5 pb-2.5">
-          <span class="font-bold text-cyan-400">${act.user_name}</span> 
-          <span class="${act.is_comment ? 'block bg-slate-900 border border-white/10 p-2.5 rounded-xl mt-1 text-white' : 'text-slate-300'}">${act.action_text}</span>
-          <div class="text-[10px] text-slate-500 mt-0.5">${new Date(act.created_at).toLocaleString('pt-PT')}</div>
-        </div>
-      `).join('');
+      if (!supabaseClient) return;
+      var res = await supabaseClient.from('card_activities').select('*').eq('card_id', cardId).order('created_at', { ascending: false });
+      var list = (res.data || []).filter(function(a) { return showActivityDetails || a.is_comment; });
+      var container = document.getElementById('activitiesContainer');
+      container.innerHTML = list.map(function(act) {
+        return '<div class="border-b border-white/5 pb-2.5">' +
+          '<span class="font-bold text-cyan-400">' + act.user_name + '</span> ' +
+          '<span class="' + (act.is_comment ? 'block bg-slate-900 border border-white/10 p-2.5 rounded-xl mt-1 text-white' : 'text-slate-300') + '">' + act.action_text + '</span>' +
+          '<div class="text-[10px] text-slate-500 mt-0.5">' + new Date(act.created_at).toLocaleString('pt-BR') + '</div>' +
+        '</div>';
+      }).join('');
     }
 
-    supabaseClient.channel('realtime-kanban-2030')
-      .on('postgres_changes', { event: '*', schema: 'public' }, () => loadAllData())
-      .subscribe();
+    // Desenha o quadro na tela no milissegundo zero e depois sincroniza com o Supabase
+    renderMemberAvatars();
+    renderBoard();
+    window.loadAllData();
 
-    loadAllData();
+    if (supabaseClient) {
+      supabaseClient.channel('realtime-kanban-2030')
+        .on('postgres_changes', { event: '*', schema: 'public' }, function() { window.loadAllData(); })
+        .subscribe();
+    }
   </script>
 </body>
 </html>
